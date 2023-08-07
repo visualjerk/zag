@@ -1,10 +1,12 @@
 import type { StateMachine as S } from "@zag-js/core"
 import type { Placement, PositioningOptions } from "@zag-js/popper"
-import type { CommonProperties, RequiredBy, RootProperties } from "@zag-js/types"
+import type { CommonProperties, PropTypes, RequiredBy, RootProperties } from "@zag-js/types"
 
 type ElementIds = Partial<{
   trigger: string
   content: string
+  arrow: string
+  positioner: string
 }>
 
 type PublicContext = CommonProperties & {
@@ -58,6 +60,34 @@ type PublicContext = CommonProperties & {
    * Whether the tooltip is disabled
    */
   disabled?: boolean
+  /**
+   * Whether the tooltip is open
+   */
+  open?: boolean
+}
+
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * Whether the tooltip is open.
+   */
+  isOpen: boolean
+  /**
+   * Function to open the tooltip.
+   */
+  open(): void
+  /**
+   * Function to close the tooltip.
+   */
+  close(): void
+  /**
+   * Function to reposition the popover
+   */
+  setPositioning(options?: Partial<PositioningOptions>): void
+  triggerProps: T["button"]
+  arrowProps: T["element"]
+  arrowTipProps: T["element"]
+  positionerProps: T["element"]
+  contentProps: T["element"]
 }
 
 export type UserDefinedContext = RequiredBy<PublicContext, "id">
@@ -77,9 +107,9 @@ type PrivateContext = RootProperties & {
   currentPlacement?: Placement
   /**
    * @internal
-   * Whether the dynamic placement has been computed
+   * Whether the pointermove already opened the tooltip.
    */
-  isPlacementComplete?: boolean
+  hasPointerMoveOpened?: boolean
 }
 
 export type MachineContext = PublicContext & ComputedContext & PrivateContext
@@ -92,3 +122,5 @@ export type MachineState = {
 export type State = S.State<MachineContext, MachineState>
 
 export type Send = S.Send<S.AnyEventObject>
+
+export type { PositioningOptions, Placement }

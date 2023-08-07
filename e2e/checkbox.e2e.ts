@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test"
+import { expect, type Page, test } from "@playwright/test"
 import { a11y, controls, part } from "./__utils"
 
 const root = part("root")
@@ -7,15 +7,9 @@ const control = part("control")
 const input = part("input")
 
 const expectToBeChecked = async (page: Page) => {
-  await expect(page.locator(root)).toHaveAttribute("data-checked", "")
-  await expect(page.locator(label)).toHaveAttribute("data-checked", "")
-  await expect(page.locator(control)).toHaveAttribute("data-checked", "")
-}
-
-const expectNotToBeChecked = async (page: Page) => {
-  await expect(page.locator(root)).not.toHaveAttribute("data-checked", "")
-  await expect(page.locator(label)).not.toHaveAttribute("data-checked", "")
-  await expect(page.locator(control)).not.toHaveAttribute("data-checked", "")
+  await expect(page.locator(root)).toHaveAttribute("data-state", "checked")
+  await expect(page.locator(label)).toHaveAttribute("data-state", "checked")
+  await expect(page.locator(control)).toHaveAttribute("data-state", "checked")
 }
 
 test.beforeEach(async ({ page }) => {
@@ -56,19 +50,6 @@ test("should not be focusable when disabled", async ({ page }) => {
   await page.click("main")
   await page.keyboard.press("Tab")
   await expect(page.locator(input)).not.toBeFocused()
-})
-
-test("should be focusable when readonly", async ({ page }) => {
-  await controls(page).bool("readOnly")
-  await page.click("main")
-  await page.keyboard.press("Tab")
-  await expect(page.locator(input)).toBeFocused()
-})
-
-test("should not be changeable when readonly", async ({ page }) => {
-  await controls(page).bool("readOnly")
-  await page.click(root)
-  await expectNotToBeChecked(page)
 })
 
 test("input is not blurred on label click", async ({ page }) => {

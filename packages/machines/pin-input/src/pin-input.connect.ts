@@ -1,19 +1,13 @@
-import {
-  ariaAttr,
-  dataAttr,
-  EventKeyMap,
-  getEventKey,
-  getNativeEvent,
-  isModifiedEvent,
-  visuallyHiddenStyle,
-} from "@zag-js/dom-utils"
+import { type EventKeyMap, getEventKey, getNativeEvent, isModifiedEvent } from "@zag-js/dom-event"
+import { ariaAttr, dataAttr } from "@zag-js/dom-query"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { invariant } from "@zag-js/utils"
+import { visuallyHiddenStyle } from "@zag-js/visually-hidden"
 import { parts } from "./pin-input.anatomy"
 import { dom } from "./pin-input.dom"
-import type { Send, State } from "./pin-input.types"
+import type { PublicApi, Send, State } from "./pin-input.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isValueComplete = state.context.isValueComplete
   const isInvalid = state.context.invalid
   const focusedIndex = state.context.focusedIndex
@@ -27,18 +21,22 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     value: state.context.value,
     valueAsString: state.context.valueAsString,
     isValueComplete: isValueComplete,
+
     setValue(value: string[]) {
       if (!Array.isArray(value)) {
         invariant("[pin-input/setValue] value must be an array")
       }
       send({ type: "SET_VALUE", value })
     },
+
     clearValue() {
       send({ type: "CLEAR_VALUE" })
     },
+
     setValueAtIndex(index: number, value: string) {
       send({ type: "SET_VALUE", value, index })
     },
+
     focus,
 
     rootProps: normalize.element({

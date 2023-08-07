@@ -1,5 +1,149 @@
 # @zag-js/core
 
+## 0.13.0
+
+### Minor Changes
+
+- [`4a2d8b77`](https://github.com/chakra-ui/zag/commit/4a2d8b77d1e71ad6b6c10134bc4186db6e6c0414) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add support for transforming context before settings it in the
+  machine's context. This is useful when some values need to passed to `ref` function
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.13.0
+
+## 0.12.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.12.0
+
+## 0.11.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.11.2
+
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.11.1
+
+## 0.11.0
+
+### Patch Changes
+
+- [`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Rebuild all packages using tsup
+
+- Updated dependencies [[`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce)]:
+  - @zag-js/store@0.11.0
+
+## 0.10.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.10.5
+
+## 0.10.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.10.4
+
+## 0.10.3
+
+### Patch Changes
+
+- [`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Use vite to build packages
+
+- Updated dependencies [[`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7)]:
+  - @zag-js/store@0.10.3
+
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.10.2
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.10.1
+
+## 0.10.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.10.0
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/store@0.9.2
+
+## 0.9.1
+
+### Patch Changes
+
+- [`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Force release every package to fix regression
+
+- Updated dependencies [[`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f)]:
+  - @zag-js/store@0.9.1
+
+## 0.7.0
+
+### Patch Changes
+
+- [`413cdf18`](https://github.com/chakra-ui/zag/commit/413cdf180f718469c9c8b879a43aa4501d1ae59c) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Refactor regex for `mergeProps`
+
+## 0.5.0
+
+### Patch Changes
+
+- [`ec07ff35`](https://github.com/chakra-ui/zag/commit/ec07ff3590916ebcb4450b64207370ee2af9d3d1) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - - Widen `watch` type to support `choose` helper
+  - Add `initialContext` and `initialState` to `meta` options
+
+## 0.2.12
+
+### Patch Changes
+
+- [`30dbeb28`](https://github.com/chakra-ui/zag/commit/30dbeb282f7901c33518097a0e1dd9a857f7efb0) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Fix issue where `machine.getState` returned a snapshot that is
+  incompatible with Solid.js
+
+## 0.2.11
+
+### Patch Changes
+
+- [#565](https://github.com/chakra-ui/zag/pull/565)
+  [`1e10b1f4`](https://github.com/chakra-ui/zag/commit/1e10b1f40016f5c9bdf0924a3470b9383c0dbce2) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Revert support for watching `*`
+
+## 0.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`5277f653`](https://github.com/chakra-ui/zag/commit/5277f65311c46e5792f605021d58b3b7e7dc3eaa)]:
+  - @zag-js/store@0.2.8
+
 ## 0.2.9
 
 ### Patch Changes

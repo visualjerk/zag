@@ -1,20 +1,13 @@
-import {
-  ariaAttr,
-  dataAttr,
-  EventKeyMap,
-  getEventPoint,
-  getEventStep,
-  getNativeEvent,
-  isLeftClick,
-} from "@zag-js/dom-utils"
+import { getEventPoint, getEventStep, getNativeEvent, isLeftClick, type EventKeyMap } from "@zag-js/dom-event"
+import { ariaAttr, dataAttr } from "@zag-js/dom-query"
 import { roundToDevicePixel } from "@zag-js/number-utils"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./number-input.anatomy"
 import { dom } from "./number-input.dom"
-import type { Send, State } from "./number-input.types"
+import type { PublicApi, Send, State } from "./number-input.types"
 import { utils } from "./number-input.utils"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isFocused = state.hasTag("focus")
   const isInvalid = state.context.isOutOfRange || !!state.context.invalid
 
@@ -31,27 +24,35 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     isValueEmpty,
     value: state.context.formattedValue,
     valueAsNumber: state.context.valueAsNumber,
+
     setValue(value: string | number) {
       send({ type: "SET_VALUE", value: value.toString() })
     },
+
     clearValue() {
       send("CLEAR_VALUE")
     },
+
     increment() {
       send("INCREMENT")
     },
+
     decrement() {
       send("DECREMENT")
     },
+
     setToMax() {
       send({ type: "SET_VALUE", value: state.context.max })
     },
+
     setToMin() {
       send({ type: "SET_VALUE", value: state.context.min })
     },
+
     focus() {
       dom.getInputEl(state.context)?.focus()
     },
+
     blur() {
       dom.getInputEl(state.context)?.blur()
     },
@@ -60,11 +61,14 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       id: dom.getRootId(state.context),
       ...parts.root.attrs,
       "data-disabled": dataAttr(isDisabled),
+      "data-focus": dataAttr(isFocused),
+      "data-invalid": dataAttr(isInvalid),
     }),
 
     labelProps: normalize.label({
       ...parts.label.attrs,
       "data-disabled": dataAttr(isDisabled),
+      "data-focus": dataAttr(isFocused),
       "data-invalid": dataAttr(isInvalid),
       id: dom.getLabelId(state.context),
       htmlFor: dom.getInputId(state.context),
@@ -74,6 +78,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       ...parts.control.attrs,
       role: "group",
       "aria-disabled": isDisabled,
+      "data-focus": dataAttr(isFocused),
       "data-disabled": dataAttr(isDisabled),
       "data-invalid": dataAttr(isInvalid),
       "aria-invalid": ariaAttr(state.context.invalid),
@@ -88,7 +93,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       defaultValue: state.context.formattedValue,
       pattern: state.context.pattern,
       inputMode: state.context.inputMode,
-      "aria-invalid": isInvalid || undefined,
+      "aria-invalid": ariaAttr(isInvalid),
       "data-invalid": dataAttr(isInvalid),
       disabled: isDisabled,
       "data-disabled": dataAttr(isDisabled),
@@ -109,12 +114,11 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         send("BLUR")
       },
       onChange(event) {
-        const evt = getNativeEvent(event)
-        if (evt.isComposing) return
         send({ type: "CHANGE", target: event.currentTarget, hint: "set" })
       },
       onKeyDown(event) {
         const evt = getNativeEvent(event)
+        // TODO: This blocks non-ascii characters
         if (evt.isComposing) return
 
         if (!utils.isValidNumericEvent(state.context, event)) {
@@ -199,14 +203,15 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       role: "presentation",
       onMouseDown(event) {
         if (isDisabled) return
-        const evt = getNativeEvent(event)
-        event.preventDefault()
-        const point = getEventPoint(evt)
 
+        const evt = getNativeEvent(event)
+
+        const point = getEventPoint(evt)
         point.x = point.x - roundToDevicePixel(7.5)
         point.y = point.y - roundToDevicePixel(7.5)
 
         send({ type: "PRESS_DOWN_SCRUBBER", point })
+        event.preventDefault()
       },
       style: {
         cursor: isDisabled ? undefined : "ew-resize",

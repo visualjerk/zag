@@ -1,5 +1,5 @@
 import type { StateMachine as S } from "@zag-js/core"
-import type { RequiredBy, CommonProperties, Context, DirectionProperty } from "@zag-js/types"
+import type { CommonProperties, Context, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
 
 type ElementIds = Partial<{
   root: string
@@ -42,6 +42,29 @@ type PublicContext = DirectionProperty &
     orientation?: "horizontal" | "vertical"
   }
 
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  rootProps: T["element"]
+  getItemProps(props: ItemProps): T["element"]
+  getContentProps(props: ItemProps): T["element"]
+  getTriggerProps(props: ItemProps): T["button"]
+  /**
+   * The value of the focused accordion item.
+   */
+  focusedValue: string | null
+  /**
+   * The value of the accordion
+   */
+  value: string | string[] | null
+  /**
+   * Sets the value of the accordion.
+   */
+  setValue: (value: string | string[]) => void
+  /**
+   * Gets the state of an accordion item.
+   */
+  getItemState: (props: ItemProps) => ItemState
+}
+
 export type UserDefinedContext = RequiredBy<PublicContext, "id">
 
 type ComputedContext = Readonly<{
@@ -73,4 +96,10 @@ export type Send = S.Send<S.AnyEventObject>
 export type ItemProps = {
   value: string
   disabled?: boolean
+}
+
+export type ItemState = {
+  isOpen: boolean
+  isFocused: boolean
+  isDisabled: boolean
 }

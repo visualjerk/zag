@@ -1,6 +1,7 @@
 import { createMachine, guards, ref } from "@zag-js/core"
 import { trackDismissableElement } from "@zag-js/dismissable"
-import { addPointerEvent, contains, findByTypeahead, getEventPoint, isElementEditable, raf } from "@zag-js/dom-utils"
+import { contains, getByTypeahead, isEditableElement, raf } from "@zag-js/dom-query"
+import { addDomEvent } from "@zag-js/dom-event"
 import { getBasePlacement, getPlacement } from "@zag-js/popper"
 import { getElementPolygon, isPointInPolygon } from "@zag-js/rect-utils"
 import { add, cast, compact, isArray, remove } from "@zag-js/utils"
@@ -25,11 +26,9 @@ export function machine(userContext: UserDefinedContext) {
         suspendPointer: false,
         anchorPoint: null,
         closeOnSelect: true,
-        isPlacementComplete: false,
         focusTriggerOnClose: true,
         ...ctx,
-        pointerdownNode: null,
-        typeahead: findByTypeahead.defaultOptions,
+        typeahead: getByTypeahead.defaultOptions,
         positioning: {
           placement: "bottom-start",
           gutter: 8,
@@ -193,9 +192,8 @@ export function machine(userContext: UserDefinedContext) {
 
         open: {
           tags: ["visible"],
-          activities: ["trackInteractOutside", "computePlacement"],
+          activities: ["trackInteractOutside", "trackPositioning"],
           entry: ["focusMenu", "resumePointer"],
-          exit: ["clearPointerdownNode"],
           on: {
             TRIGGER_CLICK: {
               guard: not("isTriggerItem"),
@@ -278,20 +276,23 @@ export function machine(userContext: UserDefinedContext) {
                 guard: and(not("isTriggerItemFocused"), not("isFocusedItemEditable")),
                 actions: ["invokeOnSelect", "changeOptionValue", "invokeOnValueChange"],
               },
-              { actions: ["focusItem"] },
+              { actions: "focusItem" },
             ],
             TRIGGER_POINTERLEAVE: {
               target: "closing",
               actions: "setIntentPolygon",
             },
             ITEM_POINTERDOWN: {
-              actions: ["setPointerdownNode", "focusItem"],
+              actions: "focusItem",
             },
             TYPEAHEAD: {
               actions: "focusMatchedItem",
             },
             FOCUS_MENU: {
               actions: "focusMenu",
+            },
+            SET_POSITIONING: {
+              actions: "setPositioning",
             },
           },
         },
@@ -322,7 +323,7 @@ export function machine(userContext: UserDefinedContext) {
         isForwardTabNavigation: (_ctx, evt) => !evt.shiftKey,
         isSubmenu: (ctx) => ctx.isSubmenu,
         suspendPointer: (ctx) => ctx.suspendPointer,
-        isFocusedItemEditable: (ctx) => isElementEditable(dom.getFocusedItem(ctx)),
+        isFocusedItemEditable: (ctx) => isEditableElement(dom.getFocusedItem(ctx)),
         isWithinPolygon: (ctx, evt) => {
           if (!ctx.intentPolygon) return false
           return isPointInPolygon(ctx.intentPolygon, evt.point)
@@ -330,26 +331,32 @@ export function machine(userContext: UserDefinedContext) {
       },
 
       activities: {
-        computePlacement(ctx) {
+        trackPositioning(ctx) {
           if (ctx.anchorPoint) return
           ctx.currentPlacement = ctx.positioning.placement
-          return getPlacement(dom.getTriggerEl(ctx), dom.getPositionerEl(ctx), {
+          const getPositionerEl = () => dom.getPositionerEl(ctx)
+          return getPlacement(dom.getTriggerEl(ctx), getPositionerEl, {
             ...ctx.positioning,
+            defer: true,
             onComplete(data) {
               ctx.currentPlacement = data.placement
-              ctx.isPlacementComplete = true
             },
           })
         },
         trackInteractOutside(ctx, _evt, { send }) {
-          return trackDismissableElement(dom.getContentEl(ctx), {
+          const getContentEl = () => dom.getContentEl(ctx)
+          return trackDismissableElement(getContentEl, {
+            defer: true,
             exclude: [dom.getTriggerEl(ctx)],
+            onInteractOutside: ctx.onInteractOutside,
+            onFocusOutside: ctx.onFocusOutside,
             onEscapeKeyDown(event) {
               if (ctx.isSubmenu) event.preventDefault()
               closeRootMenu(ctx)
             },
             onPointerDownOutside(event) {
               ctx.focusTriggerOnClose = !event.detail.focusable
+              ctx.onPointerDownOutside?.(event)
             },
             onDismiss() {
               send({ type: "REQUEST_CLOSE", src: "interact-outside" })
@@ -362,8 +369,9 @@ export function machine(userContext: UserDefinedContext) {
           ctx.parent!.state.context.suspendPointer = true
 
           const doc = dom.getDoc(ctx)
-          return addPointerEvent(doc, "pointermove", (e) => {
-            const isMovingToSubmenu = isWithinPolygon(ctx, { point: getEventPoint(e) })
+          return addDomEvent(doc, "pointermove", (e) => {
+            const point = { x: e.clientX, y: e.clientY }
+            const isMovingToSubmenu = isWithinPolygon(ctx, { point })
             if (!isMovingToSubmenu) {
               send("POINTER_MOVED_AWAY_FROM_SUBMENU")
               // NOTE: we're mutating parent context here. sending events to parent doesn't work
@@ -394,13 +402,21 @@ export function machine(userContext: UserDefinedContext) {
               left: "0",
               transform: `translate3d(${point.x}px, ${point.y}px, 0)`,
             })
-            ctx.isPlacementComplete = true
           })
         },
         setSubmenuPlacement(ctx) {
           if (!ctx.isSubmenu) return
           ctx.positioning.placement = ctx.isRtl ? "left-start" : "right-start"
           ctx.positioning.gutter = 0
+        },
+        setPositioning(ctx, evt) {
+          const getPositionerEl = () => dom.getPositionerEl(ctx)
+          getPlacement(dom.getTriggerEl(ctx), getPositionerEl, {
+            ...ctx.positioning,
+            ...evt.options,
+            defer: true,
+            listeners: false,
+          })
         },
         invokeOnValueChange(ctx, evt) {
           if (!ctx.value) return
@@ -460,7 +476,7 @@ export function machine(userContext: UserDefinedContext) {
             const activeEl = dom.getActiveElement(ctx)
             const contentEl = dom.getContentEl(ctx)
             if (contains(contentEl, activeEl)) return
-            contentEl?.focus()
+            contentEl?.focus({ preventScroll: true })
           })
         },
         focusFirstItem(ctx) {
@@ -484,16 +500,13 @@ export function machine(userContext: UserDefinedContext) {
         invokeOnSelect(ctx) {
           if (!ctx.highlightedId) return
           ctx.onSelect?.({ value: ctx.highlightedId })
-          if (!ctx.closeOnSelect) {
-            ctx.pointerdownNode = null
-          }
         },
-        focusItem(ctx, event) {
-          ctx.highlightedId = event.id
+        focusItem(ctx, evt) {
+          ctx.highlightedId = evt.id
         },
         focusTrigger(ctx) {
           if (ctx.isSubmenu || ctx.anchorPoint || !ctx.focusTriggerOnClose) return
-          raf(() => dom.getTriggerEl(ctx)?.focus())
+          raf(() => dom.getTriggerEl(ctx)?.focus({ preventScroll: true }))
         },
         focusMatchedItem(ctx, evt) {
           const node = dom.getElemByKey(ctx, evt.key)
@@ -527,12 +540,6 @@ export function machine(userContext: UserDefinedContext) {
         },
         restoreParentFocus(ctx) {
           ctx.parent?.send("RESTORE_FOCUS")
-        },
-        setPointerdownNode(ctx, evt) {
-          ctx.pointerdownNode = ref(evt.target)
-        },
-        clearPointerdownNode(ctx) {
-          ctx.pointerdownNode = null
         },
         invokeOnOpen(ctx) {
           ctx.onOpen?.()

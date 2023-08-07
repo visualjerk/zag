@@ -1,20 +1,22 @@
-import {
-  ariaAttr,
-  dataAttr,
-  EventKeyMap,
-  findByTypeahead,
-  getEventKey,
-  isElementEditable,
-  visuallyHiddenStyle,
-} from "@zag-js/dom-utils"
+import { getEventKey, type EventKeyMap } from "@zag-js/dom-event"
+import { ariaAttr, dataAttr, getByTypeahead, isEditableElement, isSelfEvent } from "@zag-js/dom-query"
 import { getPlacementStyles } from "@zag-js/popper"
-import { NormalizeProps, type PropTypes } from "@zag-js/types"
+import type { NormalizeProps, PropTypes } from "@zag-js/types"
+import { visuallyHiddenStyle } from "@zag-js/visually-hidden"
 import { parts } from "./select.anatomy"
 import { dom } from "./select.dom"
-import { Option, OptionGroupLabelProps, OptionGroupProps, OptionProps, Send, State } from "./select.types"
+import type {
+  Option,
+  OptionGroupLabelProps,
+  OptionGroupProps,
+  OptionProps,
+  PublicApi,
+  Send,
+  State,
+} from "./select.types"
 import * as utils from "./select.utils"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const disabled = state.context.disabled
   const invalid = state.context.invalid
   const isInteractive = state.context.isInteractive
@@ -30,12 +32,12 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     return {
       isDisabled: Boolean(props.disabled || disabled),
       isHighlighted: state.context.highlightedId === id,
-      isSelected: state.context.selectedOption?.value === props.value,
+      isChecked: state.context.selectedOption?.value === props.value,
     }
   }
 
   const popperStyles = getPlacementStyles({
-    measured: !!state.context.currentPlacement,
+    ...state.context.positioning,
     placement: state.context.currentPlacement,
   })
 
@@ -43,29 +45,34 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     isOpen,
     highlightedOption,
     selectedOption,
+
     focus() {
-      dom.getTriggerElement(state.context).focus()
+      dom.getTriggerElement(state.context)?.focus()
     },
-    blur() {
-      dom.getTriggerElement(state.context).blur()
-    },
+
     open() {
       send("OPEN")
     },
+
     close() {
       send("CLOSE")
     },
+
     setSelectedOption(value: Option) {
       utils.validateOptionData(value)
       send({ type: "SELECT_OPTION", value })
     },
+
     setHighlightedOption(value: Option) {
       utils.validateOptionData(value)
       send({ type: "HIGHLIGHT_OPTION", value })
     },
+
     clearSelectedOption() {
       send({ type: "CLEAR_SELECTED" })
     },
+
+    getOptionState,
 
     labelProps: normalize.label({
       dir: state.context.dir,
@@ -94,7 +101,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       type: "button",
       "aria-controls": dom.getContentId(state.context),
       "aria-expanded": isOpen,
-      "data-expanded": dataAttr(isOpen),
+      "data-state": isOpen ? "open" : "closed",
       "aria-haspopup": "listbox",
       "aria-labelledby": dom.getLabelId(state.context),
       ...parts.trigger.attrs,
@@ -163,14 +170,13 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
           return
         }
 
-        if (findByTypeahead.isValidEvent(event)) {
+        if (getByTypeahead.isValidEvent(event)) {
           send({ type: "TYPEAHEAD", key: event.key })
           event.preventDefault()
         }
       },
     }),
 
-    getOptionState,
     getOptionProps(props: OptionProps) {
       const { value, label, valueText } = props
       const optionState = getOptionState(props)
@@ -181,9 +187,9 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         "data-label": label,
         "data-value": value,
         "data-valuetext": valueText ?? label,
-        "aria-selected": optionState.isSelected,
-        "data-selected": dataAttr(optionState.isSelected),
-        "data-focus": dataAttr(optionState.isHighlighted),
+        "aria-selected": optionState.isChecked,
+        "data-state": optionState.isChecked ? "checked" : "unchecked",
+        "data-highlighted": dataAttr(optionState.isHighlighted),
         "data-disabled": dataAttr(optionState.isDisabled),
         "aria-disabled": ariaAttr(optionState.isDisabled),
       })
@@ -232,9 +238,10 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       id: dom.getContentId(state.context),
       role: "listbox",
       ...parts.content.attrs,
+      "data-state": isOpen ? "open" : "closed",
       "aria-activedescendant": state.context.highlightedId || "",
       "aria-labelledby": dom.getLabelId(state.context),
-      tabIndex: -1,
+      tabIndex: 0,
       onPointerMove(event) {
         if (!isInteractive) return
         const option = dom.getClosestOption(event.target)
@@ -248,7 +255,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         if (!isInteractive) return
         const option = dom.getClosestOption(event.target)
         if (!option || option.hasAttribute("data-disabled")) return
-        option?.click()
+        send({ type: "OPTION_CLICK", src: "pointerup", id: option.id })
       },
       onPointerLeave() {
         send({ type: "POINTER_LEAVE" })
@@ -257,14 +264,12 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         if (!isInteractive) return
         const option = dom.getClosestOption(event.target)
         if (!option || option.hasAttribute("data-disabled")) return
-        send({ type: "OPTION_CLICK", id: option.id })
+        send({ type: "OPTION_CLICK", src: "click", id: option.id })
       },
       onKeyDown(event) {
-        if (!isInteractive) return
+        if (!isInteractive || !isSelfEvent(event)) return
+
         const keyMap: EventKeyMap = {
-          Escape() {
-            send({ type: "ESC_KEY" })
-          },
           ArrowUp() {
             send({ type: "ARROW_UP" })
           },
@@ -277,7 +282,8 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
           End() {
             send({ type: "END" })
           },
-          Tab() {
+          Tab(event) {
+            if (event.shiftKey) return
             send({ type: "TAB" })
           },
           Enter() {
@@ -300,11 +306,11 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
           return
         }
 
-        if (isElementEditable(event.target)) {
+        if (isEditableElement(event.target)) {
           return
         }
 
-        if (findByTypeahead.isValidEvent(event)) {
+        if (getByTypeahead.isValidEvent(event)) {
           send({ type: "TYPEAHEAD", key: event.key })
           event.preventDefault()
         }

@@ -1,10 +1,10 @@
 import { ariaHidden } from "@zag-js/aria-hidden"
 import { createMachine } from "@zag-js/core"
 import { trackDismissableElement } from "@zag-js/dismissable"
-import { nextTick, raf } from "@zag-js/dom-utils"
+import { nextTick, raf } from "@zag-js/dom-query"
 import { preventBodyScroll } from "@zag-js/remove-scroll"
 import { compact, runIfFn } from "@zag-js/utils"
-import { createFocusTrap, FocusTrap } from "focus-trap"
+import { createFocusTrap, type FocusTrap } from "focus-trap"
 import { dom } from "./dialog.dom"
 import type { MachineContext, MachineState, UserDefinedContext } from "./dialog.types"
 
@@ -13,7 +13,7 @@ export function machine(userContext: UserDefinedContext) {
   return createMachine<MachineContext, MachineState>(
     {
       id: "dialog",
-      initial: ctx.defaultOpen ? "open" : "closed",
+      initial: ctx.open ? "open" : "closed",
 
       context: {
         role: "dialog",
@@ -30,19 +30,35 @@ export function machine(userContext: UserDefinedContext) {
         ...ctx,
       },
 
+      watch: {
+        open: ["toggleVisibility"],
+      },
+
       states: {
         open: {
           entry: ["checkRenderedElements"],
           activities: ["trackDismissableElement", "trapFocus", "preventScroll", "hideContentBelow"],
           on: {
-            CLOSE: { target: "closed", actions: ["invokeOnClose"] },
-            TOGGLE: { target: "closed", actions: ["invokeOnClose"] },
+            CLOSE: {
+              target: "closed",
+              actions: ["invokeOnClose", "restoreFocus"],
+            },
+            TOGGLE: {
+              target: "closed",
+              actions: ["invokeOnClose", "restoreFocus"],
+            },
           },
         },
         closed: {
           on: {
-            OPEN: { target: "open", actions: ["invokeOnOpen"] },
-            TOGGLE: { target: "open", actions: ["invokeOnOpen"] },
+            OPEN: {
+              target: "open",
+              actions: ["invokeOnOpen"],
+            },
+            TOGGLE: {
+              target: "open",
+              actions: ["invokeOnOpen"],
+            },
           },
         },
       },
@@ -50,29 +66,29 @@ export function machine(userContext: UserDefinedContext) {
     {
       activities: {
         trackDismissableElement(ctx, _evt, { send }) {
-          let cleanup: VoidFunction | undefined
-          nextTick(() => {
-            cleanup = trackDismissableElement(dom.getContentEl(ctx), {
-              pointerBlocking: ctx.modal,
-              exclude: [dom.getTriggerEl(ctx)],
-              onDismiss: () => send({ type: "CLOSE", src: "interact-outside" }),
-              onEscapeKeyDown(event) {
-                if (!ctx.closeOnEsc) {
-                  event.preventDefault()
-                } else {
-                  send({ type: "CLOSE", src: "escape-key" })
-                }
-                ctx.onEsc?.()
-              },
-              onPointerDownOutside(event) {
-                if (!ctx.closeOnOutsideClick) {
-                  event.preventDefault()
-                }
-                ctx.onOutsideClick?.()
-              },
-            })
+          const getContentEl = () => dom.getContentEl(ctx)
+          return trackDismissableElement(getContentEl, {
+            defer: true,
+            pointerBlocking: ctx.modal,
+            exclude: [dom.getTriggerEl(ctx)],
+            onDismiss() {
+              send({ type: "CLOSE", src: "interact-outside" })
+            },
+            onEscapeKeyDown(event) {
+              if (!ctx.closeOnEsc) {
+                event.preventDefault()
+              } else {
+                send({ type: "CLOSE", src: "escape-key" })
+              }
+              ctx.onEsc?.()
+            },
+            onPointerDownOutside(event) {
+              if (!ctx.closeOnOutsideClick) {
+                event.preventDefault()
+              }
+              ctx.onOutsideClick?.()
+            },
           })
-          return () => cleanup?.()
         },
         preventScroll(ctx) {
           if (!ctx.preventScroll) return
@@ -82,16 +98,16 @@ export function machine(userContext: UserDefinedContext) {
           if (!ctx.trapFocus) return
           let trap: FocusTrap
           nextTick(() => {
-            const el = dom.getContentEl(ctx)
-            if (!el) return
-            trap = createFocusTrap(el, {
+            const contentEl = dom.getContentEl(ctx)
+            if (!contentEl) return
+            trap = createFocusTrap(contentEl, {
               document: dom.getDoc(ctx),
               escapeDeactivates: false,
-              fallbackFocus: el,
+              preventScroll: true,
+              returnFocusOnDeactivate: false,
+              fallbackFocus: contentEl,
               allowOutsideClick: true,
-              returnFocusOnDeactivate: ctx.restoreFocus,
               initialFocus: runIfFn(ctx.initialFocusEl),
-              setReturnFocus: runIfFn(ctx.finalFocusEl),
             })
             try {
               trap.activate()
@@ -101,11 +117,8 @@ export function machine(userContext: UserDefinedContext) {
         },
         hideContentBelow(ctx) {
           if (!ctx.modal) return
-          let cleanup: VoidFunction | undefined
-          nextTick(() => {
-            cleanup = ariaHidden([dom.getContainerEl(ctx)])
-          })
-          return () => cleanup?.()
+          const getElements = () => [dom.getContainerEl(ctx)]
+          return ariaHidden(getElements, { defer: true })
         },
       },
       actions: {
@@ -120,6 +133,16 @@ export function machine(userContext: UserDefinedContext) {
         },
         invokeOnOpen(ctx) {
           ctx.onOpen?.()
+        },
+        toggleVisibility(ctx, _evt, { send }) {
+          send({ type: ctx.open ? "OPEN" : "CLOSE", src: "controlled" })
+        },
+        restoreFocus(ctx) {
+          if (!ctx.restoreFocus) return
+          raf(() => {
+            const el = runIfFn(ctx.finalFocusEl) ?? dom.getTriggerEl(ctx)
+            el?.focus({ preventScroll: true })
+          })
         },
       },
     },

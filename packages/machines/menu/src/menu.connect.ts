@@ -1,23 +1,31 @@
 import { mergeProps } from "@zag-js/core"
 import {
-  dataAttr,
-  EventKeyMap,
   getEventKey,
   getEventPoint,
   getNativeEvent,
   isContextMenuEvent,
-  isElementEditable,
   isLeftClick,
   isModifiedEvent,
-  isSelfEvent,
-} from "@zag-js/dom-utils"
-import { getPlacementStyles } from "@zag-js/popper"
+  type EventKeyMap,
+} from "@zag-js/dom-event"
+import { dataAttr, isEditableElement, isSelfEvent } from "@zag-js/dom-query"
+import { getPlacementStyles, type PositioningOptions } from "@zag-js/popper"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./menu.anatomy"
 import { dom } from "./menu.dom"
-import type { Api, GroupProps, ItemProps, LabelProps, OptionItemProps, Send, Service, State } from "./menu.types"
+import type {
+  Api,
+  GroupProps,
+  ItemProps,
+  LabelProps,
+  OptionItemProps,
+  PublicApi,
+  Send,
+  Service,
+  State,
+} from "./menu.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isSubmenu = state.context.isSubmenu
   const values = state.context.value
   const isTypingAhead = state.context.isTypingAhead
@@ -25,43 +33,57 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
   const isOpen = state.hasTag("visible")
 
   const popperStyles = getPlacementStyles({
-    measured: !!state.context.anchorPoint || !!state.context.currentPlacement,
+    ...state.context.positioning,
     placement: state.context.currentPlacement,
   })
 
   const api = {
     isOpen,
+
     open() {
       send("OPEN")
     },
+
     close() {
       send("CLOSE")
     },
+
     highlightedId: state.context.highlightedId,
+
     setHighlightedId(id: string) {
       send({ type: "SET_HIGHLIGHTED_ID", id })
     },
+
     setParent(parent: Service) {
       send({ type: "SET_PARENT", value: parent, id: parent.state.context.id })
     },
+
     setChild(child: Service) {
       send({ type: "SET_CHILD", value: child, id: child.state.context.id })
     },
+
     value: values,
+
     setValue(name: string, value: any) {
       send({ type: "SET_VALUE", name, value })
     },
+
     isOptionChecked(opts: OptionItemProps) {
       return opts.type === "radio" ? values?.[opts.name] === opts.value : values?.[opts.name].includes(opts.value)
     },
 
+    setPositioning(options: Partial<PositioningOptions> = {}) {
+      send({ type: "SET_POSITIONING", options })
+    },
+
     contextTriggerProps: normalize.element({
-      ...parts.trigger.attrs,
+      ...parts.contextTrigger.attrs,
       id: dom.getContextTriggerId(state.context),
       onPointerDown(event) {
         if (event.pointerType === "mouse") return
         const evt = getNativeEvent(event)
-        send({ type: "CONTEXT_MENU_START", point: getEventPoint(evt) })
+        const point = getEventPoint(evt)
+        send({ type: "CONTEXT_MENU_START", point })
       },
       onPointerCancel(event) {
         if (event.pointerType === "mouse") return
@@ -77,7 +99,8 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       },
       onContextMenu(event) {
         const evt = getNativeEvent(event)
-        send({ type: "CONTEXT_MENU", point: getEventPoint(evt) })
+        const point = getEventPoint(evt)
+        send({ type: "CONTEXT_MENU", point })
         event.preventDefault()
       },
       style: {
@@ -100,26 +123,22 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       "aria-haspopup": "menu",
       "aria-controls": dom.getContentId(state.context),
       "aria-expanded": isOpen || undefined,
-      "data-expanded": dataAttr(isOpen),
+      "data-state": isOpen ? "open" : "closed",
       onPointerMove(event) {
         if (event.pointerType !== "mouse") return
         const disabled = dom.isTargetDisabled(event.currentTarget)
         if (disabled || !isSubmenu) return
-        send({
-          type: "TRIGGER_POINTERMOVE",
-          target: event.currentTarget,
-        })
+        send({ type: "TRIGGER_POINTERMOVE", target: event.currentTarget })
       },
       onPointerLeave(event) {
         if (event.pointerType !== "mouse") return
         const evt = getNativeEvent(event)
+
         const disabled = dom.isTargetDisabled(event.currentTarget)
         if (disabled || !isSubmenu) return
-        send({
-          type: "TRIGGER_POINTERLEAVE",
-          target: event.currentTarget,
-          point: getEventPoint(evt),
-        })
+
+        const point = getEventPoint(evt)
+        send({ type: "TRIGGER_POINTERLEAVE", target: event.currentTarget, point })
       },
       onClick(event) {
         if (dom.isTriggerItem(event.currentTarget)) {
@@ -189,6 +208,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       id: dom.getContentId(state.context),
       "aria-label": state.context["aria-label"],
       hidden: !isOpen,
+      "data-state": isOpen ? "open" : "closed",
       role: "menu",
       tabIndex: 0,
       dir: state.context.dir,
@@ -253,7 +273,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         } else {
           //
           const isSingleKey = event.key.length === 1
-          const isValidTypeahead = isSingleKey && !isModifiedEvent(event) && !isElementEditable(item)
+          const isValidTypeahead = isSingleKey && !isModifiedEvent(event) && !isEditableElement(item)
 
           if (!isValidTypeahead) return
 
@@ -278,11 +298,11 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         "aria-disabled": disabled,
         "data-disabled": dataAttr(disabled),
         "data-ownedby": dom.getContentId(state.context),
-        "data-focus": dataAttr(state.context.highlightedId === id),
+        "data-highlighted": dataAttr(state.context.highlightedId === id),
         "data-valuetext": valueText,
         onClick(event) {
           if (disabled) return
-          send({ type: "ITEM_CLICK", target: event.currentTarget, id })
+          send({ type: "ITEM_CLICK", src: "click", target: event.currentTarget, id })
         },
         onPointerDown(event) {
           if (disabled) return
@@ -290,8 +310,8 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         },
         onPointerUp(event) {
           const evt = getNativeEvent(event)
-          if (!isLeftClick(evt) || disabled || state.context.pointerdownNode === event.currentTarget) return
-          event.currentTarget.click()
+          if (!isLeftClick(evt) || disabled) return
+          send({ type: "ITEM_CLICK", src: "pointerup", target: event.currentTarget, id })
         },
         onPointerLeave(event) {
           if (disabled || event.pointerType !== "mouse") return
@@ -308,7 +328,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         onAuxClick(event) {
           if (disabled) return
           event.preventDefault()
-          event.currentTarget.click()
+          send({ type: "ITEM_CLICK", src: "auxclick", target: event.currentTarget, id })
         },
       })
     },
@@ -330,10 +350,22 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
           "data-value": option.value,
           role: `menuitem${type}`,
           "aria-checked": !!checked,
-          "data-checked": dataAttr(checked),
+          "data-state": checked ? "checked" : "unchecked",
           onClick(event) {
             if (disabled) return
-            send({ type: "ITEM_CLICK", target: event.currentTarget, option })
+            send({ type: "ITEM_CLICK", src: "click", target: event.currentTarget, option })
+            onCheckedChange?.(!checked)
+          },
+          onPointerUp(event) {
+            const evt = getNativeEvent(event)
+            if (!isLeftClick(evt) || disabled) return
+            send({ type: "ITEM_CLICK", src: "pointerup", target: event.currentTarget, option })
+            onCheckedChange?.(!checked)
+          },
+          onAuxClick(event) {
+            if (disabled) return
+            event.preventDefault()
+            send({ type: "ITEM_CLICK", src: "auxclick", target: event.currentTarget, option })
             onCheckedChange?.(!checked)
           },
         }),

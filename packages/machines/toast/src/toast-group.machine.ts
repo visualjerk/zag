@@ -1,5 +1,5 @@
 import { createMachine } from "@zag-js/core"
-import { MAX_Z_INDEX } from "@zag-js/dom-utils"
+import { MAX_Z_INDEX } from "@zag-js/dom-query"
 import { compact } from "@zag-js/utils"
 import { createToastMachine } from "./toast.machine"
 import type { GroupMachineContext, UserDefinedGroupContext } from "./toast.types"
@@ -56,6 +56,7 @@ export function groupMachine(userContext: UserDefinedGroupContext) {
         guard: (ctx) => ctx.toasts.length < ctx.max,
         actions: (ctx, evt, { self }) => {
           const options = {
+            ...ctx.defaultOptions,
             ...evt.toast,
             pauseOnPageIdle: ctx.pauseOnPageIdle,
             pauseOnInteraction: ctx.pauseOnInteraction,

@@ -1,5 +1,181 @@
 # @zag-js/react
 
+## 0.13.0
+
+### Patch Changes
+
+- Updated dependencies [[`4a2d8b77`](https://github.com/chakra-ui/zag/commit/4a2d8b77d1e71ad6b6c10134bc4186db6e6c0414)]:
+  - @zag-js/core@0.13.0
+  - @zag-js/store@0.13.0
+  - @zag-js/types@0.13.0
+
+## 0.12.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/core@0.12.0
+  - @zag-js/store@0.12.0
+  - @zag-js/types@0.12.0
+
+## 0.11.2
+
+### Patch Changes
+
+- [`0a2af673`](https://github.com/chakra-ui/zag/commit/0a2af67370de5ad4a4fd501f51c78aa76e6f3bf2) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Export missing types
+
+- Updated dependencies []:
+  - @zag-js/core@0.11.2
+  - @zag-js/store@0.11.2
+  - @zag-js/types@0.11.2
+
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/core@0.11.1
+  - @zag-js/store@0.11.1
+  - @zag-js/types@0.11.1
+
+## 0.11.0
+
+### Patch Changes
+
+- [`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Rebuild all packages using tsup
+
+- Updated dependencies [[`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce)]:
+  - @zag-js/store@0.11.0
+  - @zag-js/types@0.11.0
+  - @zag-js/core@0.11.0
+
+## 0.10.5
+
+### Patch Changes
+
+- [`622eea18`](https://github.com/chakra-ui/zag/commit/622eea1834d575d2ddd225e96121561b334597eb) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Fix an issue with type declarations
+
+- Updated dependencies []:
+  - @zag-js/core@0.10.5
+  - @zag-js/store@0.10.5
+  - @zag-js/types@0.10.5
+
+## 0.10.4
+
+### Patch Changes
+
+- [`2e2524e9`](https://github.com/chakra-ui/zag/commit/2e2524e9cfdb829037da8073d7fc5ad895556672) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Declare solid-js, react and vue as external dependencies
+
+- Updated dependencies []:
+  - @zag-js/core@0.10.4
+  - @zag-js/store@0.10.4
+  - @zag-js/types@0.10.4
+
+## 0.10.3
+
+### Patch Changes
+
+- [`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Use vite to build packages
+
+- Updated dependencies [[`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7)]:
+  - @zag-js/core@0.10.3
+  - @zag-js/store@0.10.3
+  - @zag-js/types@0.10.3
+
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/core@0.10.2
+  - @zag-js/store@0.10.2
+  - @zag-js/types@0.10.2
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/core@0.10.1
+  - @zag-js/store@0.10.1
+  - @zag-js/types@0.10.1
+
+## 0.10.0
+
+### Patch Changes
+
+- Updated dependencies [[`2a1fb4a0`](https://github.com/chakra-ui/zag/commit/2a1fb4a0740e6ad8e2902265e14597f087007675)]:
+  - @zag-js/types@0.10.0
+  - @zag-js/core@0.10.0
+  - @zag-js/store@0.10.0
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/core@0.9.2
+  - @zag-js/store@0.9.2
+  - @zag-js/types@0.9.2
+
+## 0.9.1
+
+### Patch Changes
+
+- [`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Force release every package to fix regression
+
+- Updated dependencies [[`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f)]:
+  - @zag-js/core@0.9.1
+  - @zag-js/store@0.9.1
+  - @zag-js/types@0.9.1
+
+## 0.7.0
+
+### Patch Changes
+
+- Updated dependencies [[`413cdf18`](https://github.com/chakra-ui/zag/commit/413cdf180f718469c9c8b879a43aa4501d1ae59c)]:
+  - @zag-js/core@0.7.0
+
+## 0.5.0
+
+### Patch Changes
+
+- Updated dependencies [[`ec07ff35`](https://github.com/chakra-ui/zag/commit/ec07ff3590916ebcb4450b64207370ee2af9d3d1),
+  [`54377b1c`](https://github.com/chakra-ui/zag/commit/54377b1c4ed85deb06453a00648b7c2c1f0c72df)]:
+  - @zag-js/core@0.5.0
+  - @zag-js/types@0.5.0
+
+## 0.3.12
+
+### Patch Changes
+
+- Updated dependencies [[`30dbeb28`](https://github.com/chakra-ui/zag/commit/30dbeb282f7901c33518097a0e1dd9a857f7efb0)]:
+  - @zag-js/core@0.2.12
+
+## 0.3.11
+
+### Patch Changes
+
+- Updated dependencies [[`1e10b1f4`](https://github.com/chakra-ui/zag/commit/1e10b1f40016f5c9bdf0924a3470b9383c0dbce2)]:
+  - @zag-js/core@0.2.11
+
+## 0.3.10
+
+### Patch Changes
+
+- [`5277f653`](https://github.com/chakra-ui/zag/commit/5277f65311c46e5792f605021d58b3b7e7dc3eaa) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Update dependencies to latest versions
+
+- Updated dependencies [[`5277f653`](https://github.com/chakra-ui/zag/commit/5277f65311c46e5792f605021d58b3b7e7dc3eaa)]:
+  - @zag-js/store@0.2.8
+  - @zag-js/core@0.2.10
+
 ## 0.3.9
 
 ### Patch Changes

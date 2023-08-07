@@ -1,5 +1,5 @@
 import { createMachine, guards } from "@zag-js/core"
-import { raf } from "@zag-js/dom-utils"
+import { raf } from "@zag-js/dom-query"
 import { dispatchInputValueEvent } from "@zag-js/form-utils"
 import { compact } from "@zag-js/utils"
 import { dom } from "./pin-input.dom"
@@ -147,6 +147,7 @@ export function machine(userContext: UserDefinedContext) {
       },
       actions: {
         setupValue: (ctx) => {
+          if (ctx.value.length) return
           const inputs = dom.getElements(ctx)
           const emptyValues = Array.from<string>({ length: inputs.length }).fill("")
           assign(ctx, emptyValues)
@@ -174,7 +175,8 @@ export function machine(userContext: UserDefinedContext) {
           ctx.onChange?.({ value: Array.from(ctx.value) })
         },
         dispatchInputEvent: (ctx) => {
-          dispatchInputValueEvent(dom.getHiddenInputEl(ctx), ctx.valueAsString)
+          const inputEl = dom.getHiddenInputEl(ctx)
+          dispatchInputValueEvent(inputEl, { value: ctx.valueAsString })
         },
         invokeOnInvalid: (ctx, evt) => {
           ctx.onInvalid?.({ value: evt.value, index: ctx.focusedIndex })

@@ -172,9 +172,8 @@ const fetchMachine = createMachine({
     },
     open: {
       tags: ["visible"],
-      activities: ["trackInteractOutside", "computePlacement"],
+      activities: ["trackInteractOutside", "trackPositioning"],
       entry: ["focusMenu", "resumePointer"],
-      exit: ["clearPointerdownNode"],
       on: {
         TRIGGER_CLICK: {
           cond: "!isTriggerItem",
@@ -241,20 +240,23 @@ const fetchMachine = createMachine({
           cond: "!isTriggerItemFocused && !isFocusedItemEditable",
           actions: ["invokeOnSelect", "changeOptionValue", "invokeOnValueChange"]
         }, {
-          actions: ["focusItem"]
+          actions: "focusItem"
         }],
         TRIGGER_POINTERLEAVE: {
           target: "closing",
           actions: "setIntentPolygon"
         },
         ITEM_POINTERDOWN: {
-          actions: ["setPointerdownNode", "focusItem"]
+          actions: "focusItem"
         },
         TYPEAHEAD: {
           actions: "focusMatchedItem"
         },
         FOCUS_MENU: {
           actions: "focusMenu"
+        },
+        SET_POSITIONING: {
+          actions: "setPositioning"
         }
       }
     }

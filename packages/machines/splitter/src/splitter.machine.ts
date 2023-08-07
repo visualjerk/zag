@@ -1,5 +1,6 @@
 import { createMachine } from "@zag-js/core"
-import { getPointPercentRelativeToNode, normalizePointValue, raf, trackPointerMove } from "@zag-js/dom-utils"
+import { getRelativePoint, trackPointerMove } from "@zag-js/dom-event"
+import { raf } from "@zag-js/dom-query"
 import { compact } from "@zag-js/utils"
 import { dom } from "./splitter.dom"
 import type { MachineContext, MachineState, UserDefinedContext } from "./splitter.types"
@@ -36,21 +37,9 @@ export function machine(userContext: UserDefinedContext) {
       },
 
       on: {
-        COLLAPSE: {
-          actions: "setStartPanelToMin",
+        SET_PANEL_SIZE: {
+          actions: "setPanelSize",
         },
-        EXPAND: {
-          actions: "setStartPanelToMax",
-        },
-        TOGGLE: [
-          {
-            guard: "isStartPanelAtMin",
-            actions: "setStartPanelToMax",
-          },
-          {
-            actions: "setStartPanelToMin",
-          },
-        ],
       },
       states: {
         idle: {
@@ -201,6 +190,13 @@ export function machine(userContext: UserDefinedContext) {
             size: panel.size,
           }))
         },
+        setPanelSize(ctx, evt) {
+          const { id, size } = evt
+          ctx.size = ctx.size.map((panel) => {
+            const panelSize = clamp(size, panel.minSize ?? 0, panel.maxSize ?? 100)
+            return panel.id === id ? { ...panel, size: panelSize } : panel
+          })
+        },
         setStartPanelToMin(ctx) {
           const bounds = getPanelBounds(ctx)
           if (!bounds) return
@@ -261,12 +257,19 @@ export function machine(userContext: UserDefinedContext) {
         setPointerValue(ctx, evt) {
           const panels = getHandlePanels(ctx)
           const bounds = getHandleBounds(ctx)
+
+          if (!panels || !bounds) return
+
           const rootEl = dom.getRootEl(ctx)
+          if (!rootEl) return
 
-          if (!panels || !rootEl || !bounds) return
+          const relativePoint = getRelativePoint(evt.point, rootEl)
+          const percentValue = relativePoint.getPercentValue({
+            dir: ctx.dir,
+            orientation: ctx.orientation,
+          })
 
-          const percent = getPointPercentRelativeToNode(evt.point, rootEl)
-          let pointValue = normalizePointValue(percent, ctx)
+          let pointValue = percentValue * 100
 
           // update active resize state here because we use `previousPanels` in the calculations
           ctx.activeResizeState = {

@@ -1,50 +1,63 @@
-import { Calendar, CalendarDate, DateValue, toCalendar, toCalendarDate, today } from "@internationalized/date"
+import {
+  type Calendar,
+  type DateValue,
+  getLocalTimeZone,
+  toCalendar,
+  toCalendarDateTime,
+  today,
+} from "@internationalized/date"
 import { constrainValue } from "./constrain"
-import { DateAvailableFn } from "./types"
+import type { DateAvailableFn } from "./types"
 
-export function getTodayDate(timezone: string) {
-  return today(timezone)
+export function getTodayDate(timeZone?: string) {
+  return today(timeZone ?? getLocalTimeZone())
 }
 
-export function getNextDay(date: CalendarDate) {
+export function getNextDay(date: DateValue) {
   return date.add({ days: 1 })
 }
 
-export function getPreviousDay(date: CalendarDate) {
+export function getPreviousDay(date: DateValue) {
   return date.subtract({ days: 1 })
 }
 
-export function setMonth(date: CalendarDate, month: number) {
+export function setMonth(date: DateValue, month: number) {
   return date.set({ month })
 }
 
-export function setYear(date: CalendarDate, year: number) {
+export function setYear(date: DateValue, year: number) {
   return date.set({ year })
 }
 
-export function setCalendar(date: CalendarDate, calendar: Calendar) {
-  return toCalendar(toCalendarDate(date), calendar)
+export function setCalendar(date: DateValue, calendar: Calendar) {
+  return toCalendar(toCalendarDateTime(date), calendar)
 }
 
 export function setDate(
-  date: CalendarDate,
-  startDate: CalendarDate,
+  date: DateValue,
+  startDate: DateValue,
   isDateUnavailable: DateAvailableFn,
-  minValue: CalendarDate,
-  maxValue: CalendarDate,
+  locale: string,
+  minValue: DateValue,
+  maxValue: DateValue,
 ) {
-  let result: CalendarDate | undefined
+  let result: DateValue | undefined
   result = constrainValue(date, minValue, maxValue)
-  result = getPreviousAvailableDate(date, startDate, isDateUnavailable)
+  result = getPreviousAvailableDate(date, startDate, locale, isDateUnavailable)
   return result
 }
 
-export function getPreviousAvailableDate(date: CalendarDate, minValue: DateValue, isDateUnavailable?: DateAvailableFn) {
+export function getPreviousAvailableDate(
+  date: DateValue,
+  minValue: DateValue,
+  locale: string,
+  isDateUnavailable?: DateAvailableFn,
+) {
   if (!isDateUnavailable) {
     return date
   }
 
-  while (date.compare(minValue) >= 0 && isDateUnavailable(date)) {
+  while (date.compare(minValue) >= 0 && isDateUnavailable(date, locale)) {
     date = date.subtract({ days: 1 })
   }
 

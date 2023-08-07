@@ -1,10 +1,11 @@
-import { dataAttr, EventKeyMap, getEventKey, isSafari } from "@zag-js/dom-utils"
+import { getEventKey, type EventKeyMap } from "@zag-js/dom-event"
+import { dataAttr, isSafari, isSelfEvent } from "@zag-js/dom-query"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./tabs.anatomy"
 import { dom } from "./tabs.dom"
-import type { Send, State, TabProps } from "./tabs.types"
+import type { ContentProps, PublicApi, Send, State, TriggerProps } from "./tabs.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const translations = state.context.translations
   const isFocused = state.matches("focused")
 
@@ -12,11 +13,17 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     value: state.context.value,
     focusedValue: state.context.focusedValue,
     previousValues: Array.from(state.context.previousValues),
+
     setValue(value: string) {
       send({ type: "SET_VALUE", value })
     },
+
     clearValue() {
       send({ type: "CLEAR_VALUE" })
+    },
+
+    setIndicatorRect(id: string | null | undefined) {
+      send({ type: "SET_INDICATOR_RECT", id })
     },
 
     rootProps: normalize.element({
@@ -36,6 +43,8 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       "data-orientation": state.context.orientation,
       "aria-label": translations.tablistLabel,
       onKeyDown(event) {
+        if (!isSelfEvent(event)) return
+
         const keyMap: EventKeyMap = {
           ArrowDown() {
             send("ARROW_DOWN")
@@ -70,7 +79,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       },
     }),
 
-    getTriggerProps(props: TabProps) {
+    getTriggerProps(props: TriggerProps) {
       const { value, disabled } = props
       const selected = state.context.value === value
 
@@ -114,7 +123,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       "data-orientation": state.context.orientation,
     }),
 
-    getContentProps({ value }: { value: string }) {
+    getContentProps({ value }: ContentProps) {
       const selected = state.context.value === value
       return normalize.element({
         ...parts.content.attrs,
@@ -123,6 +132,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         "aria-labelledby": dom.getTriggerId(state.context, value),
         role: "tabpanel",
         "data-ownedby": dom.getTablistId(state.context),
+        "data-selected": dataAttr(selected),
         hidden: !selected,
       })
     },
@@ -132,12 +142,12 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       ...parts.indicator.attrs,
       "data-orientation": state.context.orientation,
       style: {
-        "--transition-duration": "200ms",
+        "--transition-duration": "150ms",
         "--transition-property": "left, right, top, bottom, width, height",
         position: "absolute",
         willChange: "var(--transition-property)",
         transitionProperty: "var(--transition-property)",
-        transitionDuration: state.context.hasMeasuredRect ? "var(--transition-duration)" : "0ms",
+        transitionDuration: state.context.canIndicatorTransition ? "var(--transition-duration)" : "0ms",
         transitionTimingFunction: "var(--transition-timing-function)",
         ...state.context.indicatorRect,
       },

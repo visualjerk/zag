@@ -1,10 +1,11 @@
-import { dataAttr, EventKeyMap, getEventKey, getNativeEvent } from "@zag-js/dom-utils"
+import { type EventKeyMap, getEventKey, getNativeEvent } from "@zag-js/dom-event"
+import { ariaAttr, dataAttr } from "@zag-js/dom-query"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./tags-input.anatomy"
 import { dom } from "./tags-input.dom"
-import type { Send, State, TagProps } from "./tags-input.types"
+import type { PublicApi, Send, State, TagProps } from "./tags-input.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isInteractive = state.context.isInteractive
   const isDisabled = state.context.disabled
   const isReadOnly = state.context.readOnly
@@ -20,30 +21,38 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     isEmpty,
     inputValue: state.context.trimmedInputValue,
     value: state.context.value,
-    count: state.context.count,
     valueAsString: state.context.valueAsString,
+    count: state.context.count,
     isAtMax: state.context.isAtMax,
+
     setValue(value: string[]) {
       send({ type: "SET_VALUE", value })
     },
-    clearAll() {
-      send("CLEAR_ALL")
+
+    clearValue(id?: string) {
+      if (id) {
+        send({ type: "CLEAR_TAG", id })
+      } else {
+        send("CLEAR_VALUE")
+      }
     },
+
     addValue(value: string) {
       send({ type: "ADD_TAG", value })
     },
-    deleteValue(id: string) {
-      send({ type: "DELETE_TAG", id })
-    },
+
     setValueAtIndex(index: number, value: string) {
       send({ type: "SET_VALUE_AT_INDEX", index, value })
     },
+
     setInputValue(value: string) {
       send({ type: "SET_INPUT_VALUE", value })
     },
+
     clearInputValue() {
       send({ type: "SET_INPUT_VALUE", value: "" })
     },
+
     focus() {
       dom.getInputEl(state.context)?.focus()
     },
@@ -85,7 +94,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     inputProps: normalize.input({
       ...parts.input.attrs,
       "data-invalid": dataAttr(isInvalid),
-      "aria-invalid": isInvalid,
+      "aria-invalid": ariaAttr(isInvalid),
       "data-readonly": dataAttr(isReadOnly),
       maxLength: state.context.maxLength,
       id: dom.getInputId(state.context),
@@ -179,7 +188,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         hidden: isEditingTag ? state.context.editedId === id : false,
         "data-value": value,
         "data-disabled": dataAttr(isDisabled),
-        "data-selected": dataAttr(id === state.context.focusedId),
+        "data-highlighted": dataAttr(id === state.context.focusedId),
         onPointerDown(event) {
           if (!isInteractive) return
           event.preventDefault()
@@ -255,7 +264,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         },
         onClick() {
           if (!isInteractive) return
-          send({ type: "DELETE_TAG", id })
+          send({ type: "CLEAR_TAG", id })
         },
       })
     },
@@ -270,7 +279,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       hidden: isEmpty,
       onClick() {
         if (!isInteractive) return
-        send("CLEAR_ALL")
+        send("CLEAR_VALUE")
       },
     }),
   }

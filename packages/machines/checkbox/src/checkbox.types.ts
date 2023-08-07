@@ -1,5 +1,5 @@
 import type { StateMachine as S } from "@zag-js/core"
-import type { CommonProperties, Context, DirectionProperty, RequiredBy } from "@zag-js/types"
+import type { CommonProperties, Context, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
 
 type ElementIds = Partial<{
   root: string
@@ -8,6 +8,8 @@ type ElementIds = Partial<{
   label: string
 }>
 
+export type CheckedState = boolean | "indeterminate"
+
 type PublicContext = DirectionProperty &
   CommonProperties & {
     /**
@@ -15,24 +17,9 @@ type PublicContext = DirectionProperty &
      */
     ids?: ElementIds
     /**
-     * If `true`, the checkbox will be indeterminate.
-     * This only affects the icon shown inside checkbox
-     * and does not modify the isChecked property.
-     */
-    indeterminate?: boolean
-    /**
      * If `true`, the checkbox will be disabled
      */
     disabled?: boolean
-    /**
-     * If `true` and `disabled` is passed, the checkbox will
-     * remain tabbable but not interactive
-     */
-    focusable?: boolean
-    /**
-     * If `true`, the checkbox will be readonly
-     */
-    readOnly?: boolean
     /**
      * If `true`, the checkbox is marked as invalid.
      */
@@ -42,43 +29,74 @@ type PublicContext = DirectionProperty &
      */
     required?: boolean
     /**
-     * If `true`, the checkbox will be initially checked.
+     * If `true`, the checkbox will be checked.
      */
-    defaultChecked?: boolean
+    checked: CheckedState
     /**
      * The callback invoked when the checked state of the `Checkbox` changes.
      */
-    onChange?: (details: { checked: boolean | "indeterminate" }) => void
+    onChange?: (details: { checked: CheckedState }) => void
     /**
-     * The name of the input field in a checkbox
-     * (Useful for form submission).
+     * The name of the input field in a checkbox. Useful for form submission.
      */
     name?: string
     /**
-     * The associate form of the underlying checkbox.
+     * The id of the form that the checkbox belongs to.
      */
     form?: string
     /**
-     * The value to be used in the checkbox input.
-     * This is the value that will be returned on form submission.
+     * The value of checkbox input. Useful for form submission.
+     * @default "on"
      */
-    value?: string | number
-    /**
-     * Defines the string that labels the checkbox element.
-     */
-    "aria-label"?: string
-    "aria-labelledby"?: string
-    "aria-describedby"?: string
+    value: string
   }
+
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * Whether the checkbox is checked
+   */
+  isChecked: boolean
+  /**
+   * Whether the checkbox is disabled
+   */
+  isDisabled: boolean | undefined
+  /**
+   * Whether the checkbox is indeterminate
+   */
+  isIndeterminate: boolean
+  /**
+   * Whether the checkbox is focused
+   */
+  isFocused: boolean | undefined
+  /**
+   *  The checked state of the checkbox
+   */
+  checkedState: CheckedState
+  /**
+   * Function to set the checked state of the checkbox
+   */
+  setChecked(checked: CheckedState): void
+  /**
+   * Function to toggle the checked state of the checkbox
+   */
+  toggleChecked(): void
+  rootProps: T["label"]
+  labelProps: T["element"]
+  controlProps: T["element"]
+  inputProps: T["input"]
+}
 
 export type UserDefinedContext = RequiredBy<PublicContext, "id">
 
 type ComputedContext = Readonly<{
   /**
-   * @computed
-   * Whether the slider is interactive
+   * Whether the checkbox is checked
    */
-  readonly isInteractive: boolean
+  isIndeterminate: boolean
+  /**
+   * Whether the checkbox is checked
+   */
+  isChecked: boolean
 }>
 
 type PrivateContext = Context<{
@@ -86,23 +104,23 @@ type PrivateContext = Context<{
    * @internal
    * Whether the checkbox is pressed
    */
-  active: boolean
+  active?: boolean
   /**
    * @internal
    * Whether the checkbox has focus
    */
-  focused: boolean
+  focused?: boolean
   /**
    * @internal
    * Whether the checkbox is hovered
    */
-  hovered: boolean
+  hovered?: boolean
 }>
 
 export type MachineContext = PublicContext & PrivateContext & ComputedContext
 
 export type MachineState = {
-  value: "checked" | "unchecked"
+  value: "ready"
 }
 
 export type State = S.State<MachineContext, MachineState>

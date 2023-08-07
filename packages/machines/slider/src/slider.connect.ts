@@ -1,20 +1,20 @@
 import {
-  dataAttr,
-  EventKeyMap,
   getEventKey,
   getEventPoint,
   getEventStep,
   getNativeEvent,
   isLeftClick,
   isModifiedEvent,
-} from "@zag-js/dom-utils"
+  type EventKeyMap,
+} from "@zag-js/dom-event"
+import { ariaAttr, dataAttr } from "@zag-js/dom-query"
 import { getPercentValue, getValuePercent } from "@zag-js/numeric-range"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./slider.anatomy"
 import { dom } from "./slider.dom"
-import type { Send, State } from "./slider.types"
+import type { PublicApi, Send, State } from "./slider.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const ariaLabel = state.context["aria-label"]
   const ariaLabelledBy = state.context["aria-labelledby"]
   const ariaValueText = state.context.getAriaValueText?.(state.context.value)
@@ -33,22 +33,32 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     return getValuePercent(value, state.context.min, state.context.max)
   }
 
+  // TODO - getMarkerState
+
   return {
     isFocused,
     isDragging,
     value: state.context.value,
     percent: getValuePercent(state.context.value, state.context.min, state.context.max),
+
     setValue(value: number) {
       send({ type: "SET_VALUE", value })
     },
+
     getPercentValue: getPercentValueFn,
+
     getValuePercent: getValuePercentFn,
+
     focus() {
       dom.getThumbEl(state.context)?.focus()
     },
+    /**
+     * Function to increment the value of the slider by the step.
+     */
     increment() {
       send("INCREMENT")
     },
+
     decrement() {
       send("DECREMENT")
     },
@@ -86,9 +96,9 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       "data-orientation": state.context.orientation,
       "data-focus": dataAttr(isFocused),
       draggable: false,
-      "aria-invalid": isInvalid || undefined,
+      "aria-invalid": ariaAttr(isInvalid),
       "data-invalid": dataAttr(isInvalid),
-      "aria-disabled": isDisabled || undefined,
+      "aria-disabled": ariaAttr(isDisabled),
       "aria-label": ariaLabel,
       "aria-labelledby": ariaLabel ? undefined : ariaLabelledBy ?? dom.getLabelId(state.context),
       "aria-orientation": state.context.orientation,
@@ -168,6 +178,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       ...parts.output.attrs,
       "data-disabled": dataAttr(isDisabled),
       "data-invalid": dataAttr(isInvalid),
+      "data-orientation": state.context.orientation,
       id: dom.getOutputId(state.context),
       htmlFor: dom.getHiddenInputId(state.context),
       "aria-live": "off",
@@ -231,9 +242,9 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
 
       return normalize.element({
         ...parts.marker.attrs,
+        id: dom.getMarkerId(state.context, value),
         role: "presentation",
         "data-orientation": state.context.orientation,
-        id: dom.getMarkerId(state.context, value),
         "data-value": value,
         "data-disabled": dataAttr(isDisabled),
         "data-state": markerState,

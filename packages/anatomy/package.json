@@ -1,6 +1,6 @@
 {
   "name": "@zag-js/anatomy",
-  "version": "0.1.4",
+  "version": "0.13.0",
   "keywords": [
     "ui-machines",
     "state-machines",
@@ -15,16 +15,13 @@
   "repository": "https://github.com/chakra-ui/zag/tree/main/packages/machine",
   "sideEffects": false,
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build-fast": "tsup src",
-    "start": "pnpm build --watch",
-    "build": "tsup src --dts",
+    "build": "tsup",
     "test": "jest --config ../../jest.config.js --rootDir . --passWithNoTests",
     "lint": "eslint src --ext .ts,.tsx",
-    "test-ci": "pnpm test --ci --runInBand",
-    "test-watch": "pnpm test --watch -u",
     "typecheck": "tsc --noEmit",
     "prepack": "clean-package",
     "postpack": "clean-package restore"

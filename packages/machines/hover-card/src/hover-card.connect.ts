@@ -1,25 +1,30 @@
-import { dataAttr } from "@zag-js/dom-utils"
-import { getPlacementStyles } from "@zag-js/popper"
-import { NormalizeProps, type PropTypes } from "@zag-js/types"
+import { getPlacementStyles, type PositioningOptions } from "@zag-js/popper"
+import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./hover-card.anatomy"
 import { dom } from "./hover-card.dom"
-import { Send, State } from "./hover-card.types"
+import type { PublicApi, Send, State } from "./hover-card.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isOpen = state.hasTag("open")
 
   const popperStyles = getPlacementStyles({
-    measured: !!state.context.isPlacementComplete,
+    ...state.context.positioning,
     placement: state.context.currentPlacement,
   })
 
   return {
     isOpen,
+
     open() {
       send("OPEN")
     },
+
     close() {
       send("CLOSE")
+    },
+
+    setPositioning(options: Partial<PositioningOptions> = {}) {
+      send({ type: "SET_POSITIONING", options })
     },
 
     arrowProps: normalize.element({
@@ -37,8 +42,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       ...parts.trigger.attrs,
       "data-placement": state.context.currentPlacement,
       id: dom.getTriggerId(state.context),
-      "data-expanded": dataAttr(isOpen),
-
+      "data-state": isOpen ? "open" : "closed",
       onPointerEnter(event) {
         if (event.pointerType === "touch") return
         send({ type: "POINTER_ENTER", src: "trigger" })
@@ -68,7 +72,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       ...parts.content.attrs,
       id: dom.getContentId(state.context),
       hidden: !isOpen,
-      "data-expanded": dataAttr(isOpen),
+      "data-state": isOpen ? "open" : "closed",
       "data-placement": state.context.currentPlacement,
       onPointerEnter(event) {
         if (event.pointerType === "touch") return

@@ -1,15 +1,16 @@
-import { getFirstTabbable, getFocusables, getLastTabbable, defineDomHelpers, getTabbables } from "@zag-js/dom-utils"
+import { createScope } from "@zag-js/dom-query"
+import { getFirstTabbable, getFocusables, getLastTabbable, getTabbables } from "@zag-js/tabbable"
 import { runIfFn } from "@zag-js/utils"
 import type { MachineContext as Ctx } from "./popover.types"
 
-export const dom = defineDomHelpers({
+export const dom = createScope({
   getActiveEl: (ctx: Ctx) => dom.getDoc(ctx).activeElement,
 
   getAnchorId: (ctx: Ctx) => ctx.ids?.anchor ?? `popover:${ctx.id}:anchor`,
   getTriggerId: (ctx: Ctx) => ctx.ids?.trigger ?? `popover:${ctx.id}:trigger`,
   getContentId: (ctx: Ctx) => ctx.ids?.content ?? `popover:${ctx.id}:content`,
-  getPositionerId: (ctx: Ctx) => `popover:${ctx.id}:popper`,
-  getArrowId: (ctx: Ctx) => `popover:${ctx.id}:arrow`,
+  getPositionerId: (ctx: Ctx) => ctx.ids?.positioner ?? `popover:${ctx.id}:popper`,
+  getArrowId: (ctx: Ctx) => ctx.ids?.arrow ?? `popover:${ctx.id}:arrow`,
   getTitleId: (ctx: Ctx) => ctx.ids?.title ?? `popover:${ctx.id}:title`,
   getDescriptionId: (ctx: Ctx) => ctx.ids?.description ?? `popover:${ctx.id}:desc`,
   getCloseTriggerId: (ctx: Ctx) => ctx.ids?.closeTrigger ?? `popover:${ctx.id}:close`,

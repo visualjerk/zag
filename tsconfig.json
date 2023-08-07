@@ -1,8 +1,5 @@
 {
-  "exclude": ["node_modules"],
-  "include": ["packages", "scripts", "shared", "scripts"],
   "compilerOptions": {
-    "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "downlevelIteration": true,
@@ -21,9 +18,9 @@
     "skipLibCheck": true,
     "strict": true,
     "stripInternal": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "ignoreDeprecations": "5.0",
     "suppressImplicitAnyIndexErrors": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "verbatimModuleSyntax": true
   }
 }

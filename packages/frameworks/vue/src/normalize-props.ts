@@ -8,7 +8,7 @@ type ReservedProps = {
 
 type Attrs<T> = T & ReservedProps
 
-type PropTypes = JSX.IntrinsicElements & {
+export type PropTypes = JSX.IntrinsicElements & {
   element: Attrs<Vue.HTMLAttributes>
   style: Vue.CSSProperties
 }
@@ -19,17 +19,19 @@ function toCase(txt: string) {
   return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
 }
 
-const eventMap = {
+const propMap = {
   htmlFor: "for",
   className: "class",
   onDoubleClick: "onDblclick",
   onChange: "onInput",
   onFocus: "onFocusin",
   onBlur: "onFocusout",
+  defaultValue: "value",
+  defaultChecked: "checked",
 }
 
 function toVueProp(prop: string) {
-  if (prop in eventMap) return eventMap[prop]
+  if (prop in propMap) return propMap[prop]
 
   if (prop.startsWith("on")) {
     return `on${toCase(prop.substr(2))}`
@@ -41,10 +43,11 @@ function toVueProp(prop: string) {
 export const normalizeProps = createNormalizer<PropTypes>((props: Dict) => {
   const normalized: Dict = {}
   for (const key in props) {
+    const value = props[key]
     if (key === "children") {
-      if (typeof props[key] === "string") {
-        normalized["innerHTML"] = props[key]
-      } else if (process.env.NODE_ENV !== "production") {
+      if (typeof value === "string") {
+        normalized["innerHTML"] = value
+      } else if (process.env.NODE_ENV !== "production" && value != null) {
         console.warn("[Vue Normalize Prop] : avoid passing non-primitive value as `children`")
       }
     } else {

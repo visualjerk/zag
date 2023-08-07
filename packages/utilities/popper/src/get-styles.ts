@@ -1,20 +1,10 @@
 import type { Placement } from "@floating-ui/dom"
 import { cssVars } from "./middleware"
+import type { PositioningOptions } from "./types"
 
-type Options = {
-  measured: boolean
-  strategy?: "absolute" | "fixed"
+export type GetPlacementStylesOptions = {
   placement?: Placement
 }
-
-const UNMEASURED_FLOATING_STYLE = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  opacity: 0,
-  transform: "translate3d(0, -200%, 0)",
-  pointerEvents: "none",
-} as const
 
 const ARROW_FLOATING_STYLE = {
   bottom: "rotate(45deg)",
@@ -23,8 +13,8 @@ const ARROW_FLOATING_STYLE = {
   right: "rotate(315deg)",
 } as const
 
-export function getPlacementStyles(options: Options) {
-  const { measured, strategy = "absolute", placement = "bottom" } = options
+export function getPlacementStyles(options: PositioningOptions = {}) {
+  const { placement = "bottom", sameWidth, fitViewport, strategy = "absolute" } = options
 
   return {
     arrow: {
@@ -33,7 +23,6 @@ export function getPlacementStyles(options: Options) {
       height: cssVars.arrowSize.reference,
       [cssVars.arrowSizeHalf.variable]: `calc(${cssVars.arrowSize.reference} / 2)`,
       [cssVars.arrowOffset.variable]: `calc(${cssVars.arrowSizeHalf.reference} * -1)`,
-      opacity: !measured ? 0 : undefined,
     } as const,
 
     arrowTip: {
@@ -49,8 +38,13 @@ export function getPlacementStyles(options: Options) {
 
     floating: {
       position: strategy,
-      minWidth: "max-content",
-      ...(!measured && UNMEASURED_FLOATING_STYLE),
+      minWidth: sameWidth ? undefined : "max-content",
+      width: sameWidth ? "var(--reference-width)" : undefined,
+      maxWidth: fitViewport ? "var(--available-width)" : undefined,
+      maxHeight: fitViewport ? "var(--available-height)" : undefined,
+      top: "0px",
+      left: "0px",
+      transform: `translate3d(var(--x), var(--y), 0)`,
     } as const,
   }
 }

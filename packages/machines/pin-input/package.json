@@ -1,6 +1,6 @@
 {
   "name": "@zag-js/pin-input",
-  "version": "0.2.12",
+  "version": "0.13.0",
   "description": "Core logic for the pin-input widget implemented as a state machine",
   "keywords": [
     "js",
@@ -17,7 +17,8 @@
   "repository": "https://github.com/chakra-ui/zag/tree/main/packages/pin-input",
   "sideEffects": false,
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "publishConfig": {
     "access": "public"
@@ -27,23 +28,20 @@
   },
   "dependencies": {
     "@zag-js/anatomy": "workspace:*",
+    "@zag-js/dom-query": "workspace:*",
+    "@zag-js/dom-event": "workspace:*",
+    "@zag-js/form-utils": "workspace:*",
+    "@zag-js/visually-hidden": "workspace:*",
+    "@zag-js/utils": "workspace:*",
     "@zag-js/core": "workspace:*",
     "@zag-js/types": "workspace:*"
   },
   "devDependencies": {
-    "@zag-js/dom-utils": "workspace:*",
-    "@zag-js/form-utils": "workspace:*",
-    "@zag-js/utils": "workspace:*",
     "clean-package": "2.2.0"
   },
   "scripts": {
-    "build-fast": "tsup src",
-    "start": "pnpm build --watch",
-    "build": "tsup src --dts",
-    "test": "jest --config ../../../jest.config.js --rootDir . --passWithNoTests",
+    "build": "tsup",
     "lint": "eslint src --ext .ts,.tsx",
-    "test-ci": "pnpm test --ci --runInBand",
-    "test-watch": "pnpm test --watch -u",
     "typecheck": "tsc --noEmit",
     "prepack": "clean-package",
     "postpack": "clean-package restore"

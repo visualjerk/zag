@@ -1,6 +1,6 @@
 {
   "name": "@zag-js/date-utils",
-  "version": "0.1.1",
+  "version": "0.13.0",
   "description": "Date utilities for zag.js",
   "keywords": [
     "js",
@@ -14,16 +14,12 @@
   "repository": "https://github.com/chakra-ui/zag/tree/main/packages/utilities/date-utils",
   "sideEffects": false,
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build-fast": "tsup src",
-    "start": "pnpm build --watch",
-    "build": "tsup src --dts",
-    "test": "jest --config ../../../jest.config.js --rootDir . --passWithNoTests",
+    "build": "tsup",
     "lint": "eslint src --ext .ts,.tsx",
-    "test-ci": "pnpm test --ci --runInBand",
-    "test-watch": "pnpm test --watch -u",
     "typecheck": "tsc --noEmit",
     "prepack": "clean-package",
     "postpack": "clean-package restore"
@@ -40,6 +36,6 @@
   },
   "devDependencies": {
     "clean-package": "2.2.0",
-    "@internationalized/date": "^3.0.2"
+    "@internationalized/date": "^3.3.0"
   }
 }

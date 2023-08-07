@@ -1,6 +1,6 @@
 {
   "name": "@zag-js/date-picker",
-  "version": "0.0.6",
+  "version": "0.13.0",
   "description": "Core logic for the date-picker widget implemented as a state machine",
   "keywords": [
     "js",
@@ -18,16 +18,12 @@
   "repository": "https://github.com/chakra-ui/zag/tree/main/packages/date-picker",
   "sideEffects": false,
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build-fast": "tsup src",
-    "start": "pnpm build --watch",
-    "build": "tsup src --dts",
-    "test": "jest --config ../../../jest.config.js --rootDir . --passWithNoTests",
+    "build": "tsup",
     "lint": "eslint src --ext .ts,.tsx",
-    "test-ci": "pnpm test --ci --runInBand",
-    "test-watch": "pnpm test --watch -u",
     "typecheck": "tsc --noEmit",
     "prepack": "clean-package",
     "postpack": "clean-package restore"
@@ -39,18 +35,21 @@
     "url": "https://github.com/chakra-ui/zag/issues"
   },
   "dependencies": {
+    "@internationalized/date": "^3.3.0",
     "@zag-js/anatomy": "workspace:*",
     "@zag-js/core": "workspace:*",
     "@zag-js/live-region": "workspace:*",
+    "@zag-js/text-selection": "workspace:*",
+    "@zag-js/dismissable": "workspace:*",
     "@zag-js/types": "workspace:*",
-    "@internationalized/date": "^3.0.2",
-    "@internationalized/number": "^3.1.2",
     "@zag-js/date-utils": "workspace:*",
-    "proxy-memoize": "2.0.2"
+    "@zag-js/dom-query": "workspace:*",
+    "@zag-js/dom-event": "workspace:*",
+    "@zag-js/form-utils": "workspace:*",
+    "@zag-js/popper": "workspace:*",
+    "@zag-js/utils": "workspace:*"
   },
   "devDependencies": {
-    "@zag-js/dom-utils": "workspace:*",
-    "@zag-js/utils": "workspace:*",
     "clean-package": "2.2.0"
   },
   "clean-package": "../../../clean-package.config.json"

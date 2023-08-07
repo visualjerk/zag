@@ -1,5 +1,307 @@
 # @zag-js/radio-group
 
+## 0.13.0
+
+### Patch Changes
+
+- [`61fc484f`](https://github.com/chakra-ui/zag/commit/61fc484f8c052b04954c2c3a52aafd900a760fb9) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add `data-orientation` to all parts
+
+- [`0cf24c0d`](https://github.com/chakra-ui/zag/commit/0cf24c0dbb89ca2aa41e226ba05557ac96aaf0b2) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Removed unimplemented `setPreviousValue` action
+
+- Updated dependencies [[`4a2d8b77`](https://github.com/chakra-ui/zag/commit/4a2d8b77d1e71ad6b6c10134bc4186db6e6c0414)]:
+  - @zag-js/core@0.13.0
+  - @zag-js/anatomy@0.13.0
+  - @zag-js/types@0.13.0
+  - @zag-js/utils@0.13.0
+  - @zag-js/dom-query@0.13.0
+  - @zag-js/element-rect@0.13.0
+  - @zag-js/form-utils@0.13.0
+  - @zag-js/visually-hidden@0.13.0
+
+## 0.12.0
+
+### Minor Changes
+
+- [`72946ada`](https://github.com/chakra-ui/zag/commit/72946ada6d247fcd3442ca3b76b9f3db2d985e38) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add `data-state` attribute to allow styling the open/closed state
+  or checked/unchecked states
+
+  **Potential breaking change:**
+
+  We replaced `data-expanded` or `data-checked` to `data-state` attribute
+
+  - `data-expanded` maps to `data-state="open"` or `data-state="closed"`
+  - `data-checked` maps to `data-state="checked"` or `data-state="unchecked"`
+  - `data-indeterminate` maps to `data-state="indeterminate"`
+  - `data-open` maps to `data-state="open"`
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/anatomy@0.12.0
+  - @zag-js/core@0.12.0
+  - @zag-js/types@0.12.0
+  - @zag-js/utils@0.12.0
+  - @zag-js/dom-query@0.12.0
+  - @zag-js/element-rect@0.12.0
+  - @zag-js/form-utils@0.12.0
+  - @zag-js/visually-hidden@0.12.0
+
+## 0.11.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/anatomy@0.11.2
+  - @zag-js/core@0.11.2
+  - @zag-js/types@0.11.2
+  - @zag-js/utils@0.11.2
+  - @zag-js/dom-query@0.11.2
+  - @zag-js/element-rect@0.11.2
+  - @zag-js/form-utils@0.11.2
+  - @zag-js/visually-hidden@0.11.2
+
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/anatomy@0.11.1
+  - @zag-js/core@0.11.1
+  - @zag-js/types@0.11.1
+  - @zag-js/utils@0.11.1
+  - @zag-js/dom-query@0.11.1
+  - @zag-js/element-rect@0.11.1
+  - @zag-js/form-utils@0.11.1
+  - @zag-js/visually-hidden@0.11.1
+
+## 0.11.0
+
+### Patch Changes
+
+- [`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Rebuild all packages using tsup
+
+- Updated dependencies [[`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce)]:
+  - @zag-js/visually-hidden@0.11.0
+  - @zag-js/element-rect@0.11.0
+  - @zag-js/form-utils@0.11.0
+  - @zag-js/dom-query@0.11.0
+  - @zag-js/utils@0.11.0
+  - @zag-js/anatomy@0.11.0
+  - @zag-js/types@0.11.0
+  - @zag-js/core@0.11.0
+
+## 0.10.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/anatomy@0.10.5
+  - @zag-js/core@0.10.5
+  - @zag-js/types@0.10.5
+  - @zag-js/utils@0.10.5
+  - @zag-js/dom-query@0.10.5
+  - @zag-js/element-rect@0.10.5
+  - @zag-js/form-utils@0.10.5
+  - @zag-js/visually-hidden@0.10.5
+
+## 0.10.4
+
+### Patch Changes
+
+- [#718](https://github.com/chakra-ui/zag/pull/718)
+  [`14f28dbc`](https://github.com/chakra-ui/zag/commit/14f28dbcac93920971cac39095d22b205cd3d48e) Thanks
+  [@anubra266](https://github.com/anubra266)! - Fix segmented control not transitioning after first render
+
+- Updated dependencies []:
+  - @zag-js/anatomy@0.10.4
+  - @zag-js/core@0.10.4
+  - @zag-js/types@0.10.4
+  - @zag-js/utils@0.10.4
+  - @zag-js/dom-query@0.10.4
+  - @zag-js/element-rect@0.10.4
+  - @zag-js/form-utils@0.10.4
+  - @zag-js/visually-hidden@0.10.4
+
+## 0.10.3
+
+### Patch Changes
+
+- [`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Use vite to build packages
+
+- Updated dependencies [[`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7),
+  [`775f11c9`](https://github.com/chakra-ui/zag/commit/775f11c96759197fcbad14b5b8a0fbde095efc55)]:
+  - @zag-js/anatomy@0.10.3
+  - @zag-js/core@0.10.3
+  - @zag-js/types@0.10.3
+  - @zag-js/utils@0.10.3
+  - @zag-js/dom-query@0.10.3
+  - @zag-js/element-rect@0.10.3
+  - @zag-js/form-utils@0.10.3
+  - @zag-js/visually-hidden@0.10.3
+
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/anatomy@0.10.2
+  - @zag-js/core@0.10.2
+  - @zag-js/types@0.10.2
+  - @zag-js/utils@0.10.2
+  - @zag-js/dom-query@0.10.2
+  - @zag-js/element-rect@0.10.2
+  - @zag-js/form-utils@0.10.2
+  - @zag-js/visually-hidden@0.10.2
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/anatomy@0.10.1
+  - @zag-js/core@0.10.1
+  - @zag-js/types@0.10.1
+  - @zag-js/utils@0.10.1
+  - @zag-js/dom-query@0.10.1
+  - @zag-js/element-rect@0.10.1
+  - @zag-js/form-utils@0.10.1
+  - @zag-js/visually-hidden@0.10.1
+
+## 0.10.0
+
+### Patch Changes
+
+- Updated dependencies [[`e8ac03ef`](https://github.com/chakra-ui/zag/commit/e8ac03ef4b820773a5875db861735e2aac8f29da),
+  [`d2838286`](https://github.com/chakra-ui/zag/commit/d2838286fc13acae3f0818653d5feee982703f23),
+  [`2a1fb4a0`](https://github.com/chakra-ui/zag/commit/2a1fb4a0740e6ad8e2902265e14597f087007675),
+  [`a30258e8`](https://github.com/chakra-ui/zag/commit/a30258e8137bfba5811471919e463b79039848b6)]:
+  - @zag-js/dom-query@0.10.0
+  - @zag-js/anatomy@0.10.0
+  - @zag-js/types@0.10.0
+  - @zag-js/core@0.10.0
+  - @zag-js/utils@0.10.0
+  - @zag-js/element-rect@0.10.0
+  - @zag-js/form-utils@0.10.0
+  - @zag-js/visually-hidden@0.10.0
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/anatomy@0.9.2
+  - @zag-js/core@0.9.2
+  - @zag-js/types@0.9.2
+  - @zag-js/utils@0.9.2
+  - @zag-js/dom-query@0.9.2
+  - @zag-js/element-rect@0.9.2
+  - @zag-js/form-utils@0.9.2
+  - @zag-js/visually-hidden@0.9.2
+
+## 0.9.1
+
+### Patch Changes
+
+- [`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Force release every package to fix regression
+
+- Updated dependencies [[`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f)]:
+  - @zag-js/anatomy@0.9.1
+  - @zag-js/core@0.9.1
+  - @zag-js/types@0.9.1
+  - @zag-js/utils@0.9.1
+  - @zag-js/dom-query@0.9.1
+  - @zag-js/element-rect@0.9.1
+  - @zag-js/form-utils@0.9.1
+  - @zag-js/visually-hidden@0.9.1
+
+## 0.9.0
+
+### Patch Changes
+
+- Updated dependencies [[`6274ed5e`](https://github.com/chakra-ui/zag/commit/6274ed5e460400ef7038d2b3b6c1f0ce679ca649)]:
+  - @zag-js/anatomy@0.9.0
+
+## 0.8.0
+
+### Patch Changes
+
+- [`45503699`](https://github.com/chakra-ui/zag/commit/4550369900e712d4c4676539b97012d82c50f2b9) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add support for `indicator` part to allow creating segmented
+  controls.
+
+- Updated dependencies [[`bf136f6e`](https://github.com/chakra-ui/zag/commit/bf136f6ef8c9499bd0fbc4be057d02697e97a010)]:
+  - @zag-js/element-rect@0.8.0
+
+## 0.7.0
+
+### Patch Changes
+
+- Updated dependencies [[`413cdf18`](https://github.com/chakra-ui/zag/commit/413cdf180f718469c9c8b879a43aa4501d1ae59c)]:
+  - @zag-js/core@0.7.0
+
+## 0.5.0
+
+### Patch Changes
+
+- Updated dependencies [[`ec07ff35`](https://github.com/chakra-ui/zag/commit/ec07ff3590916ebcb4450b64207370ee2af9d3d1),
+  [`54377b1c`](https://github.com/chakra-ui/zag/commit/54377b1c4ed85deb06453a00648b7c2c1f0c72df)]:
+  - @zag-js/core@0.5.0
+  - @zag-js/types@0.5.0
+
+## 0.2.3
+
+### Patch Changes
+
+- [`7c56fc43`](https://github.com/chakra-ui/zag/commit/7c56fc43f6a532754e9ad0144715b57c56a790ee) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Fix issue where shows console warning due to `preventDefault` call
+  in pointer event on mobile
+
+- Updated dependencies [[`30dbeb28`](https://github.com/chakra-ui/zag/commit/30dbeb282f7901c33518097a0e1dd9a857f7efb0)]:
+  - @zag-js/utils@0.3.4
+  - @zag-js/core@0.2.12
+
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`1e10b1f4`](https://github.com/chakra-ui/zag/commit/1e10b1f40016f5c9bdf0924a3470b9383c0dbce2)]:
+  - @zag-js/core@0.2.11
+
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`1446d88b`](https://github.com/chakra-ui/zag/commit/1446d88bff3848f2a2ec0a793ee83281cda966e8)]:
+  - @zag-js/dom-query@0.1.4
+
+## 0.2.0
+
+### Minor Changes
+
+- [#520](https://github.com/chakra-ui/zag/pull/520)
+  [`aeec61a7`](https://github.com/chakra-ui/zag/commit/aeec61a707832e0d89ccaf06047a85fc94581237) Thanks
+  [@visualjerk](https://github.com/visualjerk)! - Add `aria-labelledby` to radio group for improved screen reader
+  accessibility
+
+### Patch Changes
+
+- [#536](https://github.com/chakra-ui/zag/pull/536)
+  [`aabc9aed`](https://github.com/chakra-ui/zag/commit/aabc9aed93ae3f49e2cec8d8b28edd23a337ce99) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Refactor all packages to have proper dependency structure and
+  bundle size.
+
+- Updated dependencies [[`aabc9aed`](https://github.com/chakra-ui/zag/commit/aabc9aed93ae3f49e2cec8d8b28edd23a337ce99)]:
+  - @zag-js/visually-hidden@0.0.1
+  - @zag-js/form-utils@0.2.5
+  - @zag-js/dom-query@0.1.3
+  - @zag-js/core@0.2.10
+
 ## 0.1.12
 
 ### Patch Changes

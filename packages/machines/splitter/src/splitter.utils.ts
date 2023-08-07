@@ -1,4 +1,4 @@
-import { MachineContext as Ctx, NormalizedPanelData } from "./splitter.types"
+import type { MachineContext as Ctx, NormalizedPanelData } from "./splitter.types"
 
 function validateSize(key: string, size: number) {
   if (Math.floor(size) > 100) {
@@ -12,7 +12,7 @@ export function getNormalizedPanels(ctx: Ctx): NormalizedPanelData {
   let totalMinSize = 0
 
   const panels = ctx.size.map((panel) => {
-    const minSize = panel.minSize ?? 10
+    const minSize = panel.minSize ?? 0
     const maxSize = panel.maxSize ?? 100
 
     totalMinSize += minSize

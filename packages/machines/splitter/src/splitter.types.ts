@@ -1,5 +1,5 @@
 import type { StateMachine as S } from "@zag-js/core"
-import type { CommonProperties, Context, DirectionProperty, RequiredBy } from "@zag-js/types"
+import type { CommonProperties, Context, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
 
 export type PanelId = string | number
 
@@ -15,15 +15,86 @@ type ResizeDetails = {
   activeHandleId: string | null
 }
 
+type ElementIds = Partial<{
+  root: string
+  resizeTrigger(id: string): string
+  label(id: string): string
+  panel(id: string | number): string
+}>
+
 type PublicContext = DirectionProperty &
   CommonProperties & {
-    // pushSiblings?: boolean
+    /**
+     * The orientation of the splitter. Can be `horizontal` or `vertical`
+     */
     orientation: "horizontal" | "vertical"
+    /**
+     * The size data of the panels
+     */
     size: PanelSizeData[]
+    /**
+     * Function called when the splitter is resized.
+     */
     onResize?: (details: ResizeDetails) => void
+    /**
+     * Function called when the splitter resize starts.
+     */
     onResizeStart?: (details: ResizeDetails) => void
+    /**
+     * Function called when the splitter resize ends.
+     */
     onResizeEnd?: (details: ResizeDetails) => void
+    /**
+     * The ids of the elements in the splitter. Useful for composition.
+     */
+    ids?: ElementIds
   }
+
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * Whether the splitter is focused.
+   */
+  isFocused: boolean
+  /**
+   * Whether the splitter is being dragged.
+   */
+  isDragging: boolean
+  /**
+   *  The bounds of the currently dragged splitter handle.
+   */
+  bounds:
+    | {
+        min: number
+        max: number
+      }
+    | undefined
+  /**
+   * Function to set a panel to its minimum size.
+   */
+  setToMinSize(id: PanelId): void
+  /**
+   * Function to set a panel to its maximum size.
+   */
+  setToMaxSize(id: PanelId): void
+  /**
+   * Function to set the size of a panel.
+   */
+  setSize(id: PanelId, size: number): void
+  /**
+   * Returns the state details for a resize trigger.
+   */
+  getResizeTriggerState(props: ResizeTriggerProps): {
+    isDisabled: boolean
+    isFocused: boolean
+    panelIds: string[]
+    min: number | undefined
+    max: number | undefined
+    value: number
+  }
+  rootProps: T["element"]
+  getPanelProps(props: PanelProps): T["element"]
+  getResizeTriggerProps(props: ResizeTriggerProps): T["element"]
+}
 
 export type UserDefinedContext = RequiredBy<PublicContext, "id">
 

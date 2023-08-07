@@ -1,11 +1,12 @@
-import { dataAttr } from "@zag-js/dom-utils"
+import { dataAttr } from "@zag-js/dom-query"
+import type { PositioningOptions } from "@zag-js/popper"
 import { getPlacementStyles } from "@zag-js/popper"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
-import { dom } from "./popover.dom"
-import type { Send, State } from "./popover.types"
 import { parts } from "./popover.anatomy"
+import { dom } from "./popover.dom"
+import type { PublicApi, Send, State } from "./popover.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isOpen = state.matches("open")
 
   const currentPlacement = state.context.currentPlacement
@@ -13,18 +14,24 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
   const rendered = state.context.renderedElements
 
   const popperStyles = getPlacementStyles({
-    measured: !!state.context.isPlacementComplete,
+    ...state.context.positioning,
     placement: currentPlacement,
   })
 
   return {
     portalled,
     isOpen,
+
     open() {
       send("OPEN")
     },
+
     close() {
       send("CLOSE")
+    },
+
+    setPositioning(options: Partial<PositioningOptions> = {}) {
+      send({ type: "SET_POSITIONING", options })
     },
 
     arrowProps: normalize.element({
@@ -50,7 +57,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       id: dom.getTriggerId(state.context),
       "aria-haspopup": "dialog",
       "aria-expanded": isOpen,
-      "data-expanded": dataAttr(isOpen),
+      "data-state": isOpen ? "open" : "closed",
       "aria-controls": dom.getContentId(state.context),
       onClick() {
         send("TOGGLE")
@@ -72,6 +79,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       tabIndex: -1,
       role: "dialog",
       hidden: !isOpen,
+      "data-state": isOpen ? "open" : "closed",
       "data-expanded": dataAttr(isOpen),
       "aria-labelledby": rendered.title ? dom.getTitleId(state.context) : undefined,
       "aria-describedby": rendered.description ? dom.getDescriptionId(state.context) : undefined,

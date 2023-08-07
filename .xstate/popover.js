@@ -11,13 +11,8 @@ const {
 } = actions;
 const fetchMachine = createMachine({
   id: "popover",
-  initial: ctx.defaultOpen ? "open" : "closed",
-  context: {
-    "!isRelatedTargetWithinContent": false,
-    "isTriggerFocused && portalled": false,
-    "isLastTabbableElement && closeOnInteractOutside && portalled": false,
-    "(isFirstTabbableElement || isContentFocused) && portalled": false
-  },
+  initial: ctx.open ? "open" : "closed",
+  context: {},
   entry: ["checkRenderedElements"],
   on: {
     UPDATE_CONTEXT: {
@@ -26,37 +21,35 @@ const fetchMachine = createMachine({
   },
   states: {
     closed: {
-      entry: "invokeOnClose",
       on: {
-        TOGGLE: "open",
-        OPEN: "open"
+        TOGGLE: {
+          target: "open",
+          actions: ["invokeOnOpen"]
+        },
+        OPEN: {
+          target: "open",
+          actions: ["invokeOnOpen"]
+        }
       }
     },
     open: {
-      activities: ["trapFocus", "preventScroll", "hideContentBelow", "computePlacement", "trackInteractionOutside", "trackTabKeyDown"],
-      entry: ["setInitialFocus", "invokeOnOpen"],
+      activities: ["trapFocus", "preventScroll", "hideContentBelow", "trackPositioning", "trackDismissableElement", "proxyTabFocus"],
+      entry: ["setInitialFocus"],
       on: {
-        CLOSE: "closed",
+        CLOSE: {
+          target: "closed",
+          actions: ["invokeOnClose"]
+        },
         REQUEST_CLOSE: {
           target: "closed",
-          actions: "focusTriggerIfNeeded"
+          actions: ["restoreFocusIfNeeded", "invokeOnClose"]
         },
-        TOGGLE: "closed",
-        TRIGGER_BLUR: {
-          cond: "!isRelatedTargetWithinContent",
-          target: "closed"
-        },
-        TAB: [{
-          cond: "isTriggerFocused && portalled",
-          actions: "focusFirstTabbableElement"
-        }, {
-          cond: "isLastTabbableElement && closeOnInteractOutside && portalled",
+        TOGGLE: {
           target: "closed",
-          actions: "focusNextTabbableElementAfterTrigger"
-        }],
-        SHIFT_TAB: {
-          cond: "(isFirstTabbableElement || isContentFocused) && portalled",
-          actions: "focusTriggerIfNeeded"
+          actions: ["invokeOnClose"]
+        },
+        SET_POSITIONING: {
+          actions: "setPositioning"
         }
       }
     }
@@ -69,10 +62,5 @@ const fetchMachine = createMachine({
       };
     })
   },
-  guards: {
-    "!isRelatedTargetWithinContent": ctx => ctx["!isRelatedTargetWithinContent"],
-    "isTriggerFocused && portalled": ctx => ctx["isTriggerFocused && portalled"],
-    "isLastTabbableElement && closeOnInteractOutside && portalled": ctx => ctx["isLastTabbableElement && closeOnInteractOutside && portalled"],
-    "(isFirstTabbableElement || isContentFocused) && portalled": ctx => ctx["(isFirstTabbableElement || isContentFocused) && portalled"]
-  }
+  guards: {}
 });

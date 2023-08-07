@@ -1,6 +1,6 @@
 {
   "name": "@zag-js/hover-card",
-  "version": "0.2.4",
+  "version": "0.13.0",
   "description": "Core logic for the hover-card widget implemented as a state machine",
   "keywords": [
     "js",
@@ -17,16 +17,12 @@
   "repository": "https://github.com/chakra-ui/zag/tree/main/packages/hover-card",
   "sideEffects": false,
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build-fast": "tsup src",
-    "start": "pnpm build --watch",
-    "build": "tsup src --dts",
-    "test": "jest --config ../../../jest.config.js --rootDir . --passWithNoTests",
+    "build": "tsup",
     "lint": "eslint src --ext .ts,.tsx",
-    "test-ci": "pnpm test --ci --runInBand",
-    "test-watch": "pnpm test --watch -u",
     "typecheck": "tsc --noEmit",
     "prepack": "clean-package",
     "postpack": "clean-package restore"
@@ -40,13 +36,13 @@
   "dependencies": {
     "@zag-js/anatomy": "workspace:*",
     "@zag-js/core": "workspace:*",
+    "@zag-js/dom-query": "workspace:*",
+    "@zag-js/utils": "workspace:*",
     "@zag-js/dismissable": "workspace:*",
     "@zag-js/popper": "workspace:*",
     "@zag-js/types": "workspace:*"
   },
   "devDependencies": {
-    "@zag-js/dom-utils": "workspace:*",
-    "@zag-js/utils": "workspace:*",
     "clean-package": "2.2.0"
   },
   "clean-package": "../../../clean-package.config.json",

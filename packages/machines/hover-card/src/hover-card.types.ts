@@ -1,10 +1,12 @@
 import type { StateMachine as S } from "@zag-js/core"
-import { Placement, PositioningOptions } from "@zag-js/popper"
-import type { CommonProperties, Context, DirectionProperty, RequiredBy } from "@zag-js/types"
+import type { Placement, PositioningOptions } from "@zag-js/popper"
+import type { CommonProperties, Context, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
 
 type ElementIds = Partial<{
   trigger: string
   content: string
+  positioner: string
+  arrow: string
 }>
 
 type PublicContext = DirectionProperty &
@@ -16,7 +18,11 @@ type PublicContext = DirectionProperty &
     /**
      * Function invoked when the hover card is opened.
      */
-    onOpenChange?: (open: boolean) => void
+    onOpen?: VoidFunction
+    /**
+     * Function invoked when the hover card is closed.
+     */
+    onClose?: VoidFunction
     /**
      * The duration from when the mouse enters the trigger until the hover card opens.
      */
@@ -26,14 +32,38 @@ type PublicContext = DirectionProperty &
      */
     closeDelay: number
     /**
-     * Whether to open the hover card on page load
+     * Whether the hover card is open
      */
-    defaultOpen?: boolean
+    open?: boolean
     /**
      * The user provided options used to position the popover content
      */
     positioning: PositioningOptions
   }
+
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * Whether the hover card is open
+   */
+  isOpen: boolean
+  /**
+   * Function to open the hover card
+   */
+  open(): void
+  /**
+   * Function to close the hover card
+   */
+  close(): void
+  /**
+   * Function to reposition the popover
+   */
+  setPositioning(options?: Partial<PositioningOptions>): void
+  arrowProps: T["element"]
+  arrowTipProps: T["element"]
+  triggerProps: T["element"]
+  positionerProps: T["element"]
+  contentProps: T["element"]
+}
 
 type PrivateContext = Context<{
   /**
@@ -41,11 +71,6 @@ type PrivateContext = Context<{
    * The computed placement of the tooltip.
    */
   currentPlacement?: Placement
-  /**
-   * @internal
-   * Whether the dynamic placement has been computed
-   */
-  isPlacementComplete?: boolean
   /**
    * @internal
    * Whether the hover card is open by pointer
@@ -67,3 +92,5 @@ export type MachineState = {
 export type State = S.State<MachineContext, MachineState>
 
 export type Send = S.Send<S.AnyEventObject>
+
+export type { Placement, PositioningOptions }

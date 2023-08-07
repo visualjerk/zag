@@ -1,6 +1,7 @@
 import type { StateMachine as S } from "@zag-js/core"
 import type { LiveRegion } from "@zag-js/live-region"
-import type { CommonProperties, Context, DirectionProperty, RequiredBy } from "@zag-js/types"
+import type { CommonProperties, Context, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
+import type { InteractOutsideEvent, InteractOutsideHandlers } from "@zag-js/interact-outside"
 
 type IntlTranslations = {
   clearTriggerLabel: string
@@ -33,7 +34,8 @@ type ElementIds = Partial<{
 }>
 
 type PublicContext = DirectionProperty &
-  CommonProperties & {
+  CommonProperties &
+  InteractOutsideHandlers & {
     /**
      * The ids of the elements in the tags input. Useful for composition.
      */
@@ -94,7 +96,7 @@ type PublicContext = DirectionProperty &
     /**
      * Callback fired when the max tag count is reached or the `validateTag` function returns `false`
      */
-    onInvalid?: (details: { reason: ValidityState }) => void
+    onInvalid?(details: { reason: ValidityState }): void
     /**
      * Callback fired when a tag's value is updated
      */
@@ -135,6 +137,70 @@ type PublicContext = DirectionProperty &
      */
     form?: string
   }
+
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * Whether the tags are empty
+   */
+  isEmpty: boolean
+  /**
+   * The value of the tags entry input.
+   */
+  inputValue: string
+  /**
+   * The value of the tags as an array of strings.
+   */
+  value: string[]
+  /**
+   * The value of the tags as a string.
+   */
+  valueAsString: string
+  /**
+   * The number of the tags.
+   */
+  count: number
+  /**
+   * Whether the tags have reached the max limit.
+   */
+  isAtMax: boolean
+  /**
+   * Function to set the value of the tags.
+   */
+  setValue(value: string[]): void
+  /**
+   * Function to clear the value of the tags.
+   */
+  clearValue(id?: string): void
+  /**
+   * Function to add a tag to the tags.
+   */
+  addValue(value: string): void
+  /**
+   * Function to set the value of a tag at the given index.
+   */
+  setValueAtIndex(index: number, value: string): void
+  /**
+   * Function to set the value of the tags entry input.
+   */
+  setInputValue(value: string): void
+  /**
+   * Function to clear the value of the tags entry input.
+   */
+  clearInputValue(): void
+  /**
+   * Function to focus the tags entry input.
+   */
+  focus(): void
+  rootProps: T["element"]
+  labelProps: T["label"]
+  controlProps: T["element"]
+  inputProps: T["input"]
+  hiddenInputProps: T["input"]
+  getTagProps(options: TagProps): T["element"]
+  getTagInputProps(options: TagProps): T["input"]
+  getTagDeleteTriggerProps(options: TagProps): T["button"]
+  clearTriggerProps: T["button"]
+}
 
 export type UserDefinedContext = RequiredBy<PublicContext, "id">
 
@@ -227,3 +293,5 @@ export type TagProps = {
   value: string
   disabled?: boolean
 }
+
+export type { InteractOutsideEvent }

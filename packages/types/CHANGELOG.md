@@ -1,5 +1,60 @@
 # @zag-js/types
 
+## 0.13.0
+
+## 0.12.0
+
+## 0.11.2
+
+## 0.11.1
+
+## 0.11.0
+
+### Patch Changes
+
+- [`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Rebuild all packages using tsup
+
+## 0.10.5
+
+## 0.10.4
+
+## 0.10.3
+
+### Patch Changes
+
+- [`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Use vite to build packages
+
+## 0.10.2
+
+## 0.10.1
+
+## 0.10.0
+
+### Patch Changes
+
+- [#654](https://github.com/chakra-ui/zag/pull/654)
+  [`2a1fb4a0`](https://github.com/chakra-ui/zag/commit/2a1fb4a0740e6ad8e2902265e14597f087007675) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add new avatar machine
+
+## 0.9.2
+
+## 0.9.1
+
+### Patch Changes
+
+- [`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Force release every package to fix regression
+
+## 0.5.0
+
+### Patch Changes
+
+- [#550](https://github.com/chakra-ui/zag/pull/550)
+  [`54377b1c`](https://github.com/chakra-ui/zag/commit/54377b1c4ed85deb06453a00648b7c2c1f0c72df) Thanks
+  [@anubra266](https://github.com/anubra266)! - Fix handlers and attributes types for `normalizeProps`
+
 ## 0.3.4
 
 ### Patch Changes

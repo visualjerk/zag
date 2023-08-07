@@ -11,7 +11,7 @@ const {
 } = actions;
 const fetchMachine = createMachine({
   id: "hover-card",
-  initial: ctx.defaultOpen ? "open" : "closed",
+  initial: ctx.open ? "open" : "closed",
   context: {
     "!isPointer": false,
     "!isPointer": false
@@ -24,11 +24,11 @@ const fetchMachine = createMachine({
   states: {
     closed: {
       tags: ["closed"],
-      entry: ["invokeOnClose", "clearIsPointer"],
+      entry: ["clearIsPointer"],
       on: {
         POINTER_ENTER: {
-          actions: ["setIsPointer"],
-          target: "opening"
+          target: "opening",
+          actions: ["setIsPointer"]
         },
         TRIGGER_FOCUS: "opening",
         OPEN: "opening"
@@ -37,44 +37,67 @@ const fetchMachine = createMachine({
     opening: {
       tags: ["closed"],
       after: {
-        OPEN_DELAY: "open"
+        OPEN_DELAY: {
+          target: "open",
+          actions: ["invokeOnOpen"]
+        }
       },
       on: {
-        POINTER_LEAVE: "closed",
+        POINTER_LEAVE: {
+          target: "closed",
+          actions: ["invokeOnClose"]
+        },
         TRIGGER_BLUR: {
           cond: "!isPointer",
-          target: "closed"
+          target: "closed",
+          actions: ["invokeOnClose"]
         },
-        CLOSE: "closed"
+        CLOSE: {
+          target: "closed",
+          actions: ["invokeOnClose"]
+        }
       }
     },
     open: {
       tags: ["open"],
-      activities: ["trackDismissableElement", "computePlacement"],
-      entry: ["invokeOnOpen"],
+      activities: ["trackDismissableElement", "trackPositioning"],
       on: {
         POINTER_ENTER: {
           actions: ["setIsPointer"]
         },
         POINTER_LEAVE: "closing",
-        DISMISS: "closed",
-        CLOSE: "closed",
+        DISMISS: {
+          target: "closed",
+          actions: ["invokeOnClose"]
+        },
+        CLOSE: {
+          target: "closed",
+          actions: ["invokeOnClose"]
+        },
         TRIGGER_BLUR: {
           cond: "!isPointer",
-          target: "closed"
+          target: "closed",
+          actions: ["invokeOnClose"]
+        },
+        SET_POSITIONING: {
+          actions: "setPositioning"
         }
       }
     },
     closing: {
       tags: ["open"],
-      activities: ["computePlacement"],
+      activities: ["trackPositioning"],
       after: {
-        CLOSE_DELAY: "closed"
+        CLOSE_DELAY: {
+          target: "closed",
+          actions: ["invokeOnClose"]
+        }
       },
       on: {
         POINTER_ENTER: {
-          actions: ["setIsPointer"],
-          target: "open"
+          target: "open",
+          // no need to invokeOnOpen here because it's still open (but about to close)
+          actions: ["setIsPointer"]
         }
       }
     }

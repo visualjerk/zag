@@ -1,13 +1,13 @@
 import type { MachineSrc, StateMachine as S } from "@zag-js/core"
-import { createEffect, onCleanup, onMount } from "solid-js"
-import { createStore, reconcile, Store } from "solid-js/store"
+import { createEffect, onCleanup, onMount, type Accessor } from "solid-js"
+import { createStore, reconcile, type Store } from "solid-js/store"
 
 type HookOptions<
   TContext extends Record<string, any>,
   TState extends S.StateSchema,
   TEvent extends S.EventObject = S.AnyEventObject,
 > = Omit<S.HookOptions<TContext, TState, TEvent>, "context"> & {
-  context?: Store<Partial<TContext>>
+  context?: Store<Partial<TContext>> | Accessor<Partial<TContext>>
 }
 
 export function useService<
@@ -19,7 +19,8 @@ export function useService<
 
   const service = (() => {
     const _machine = typeof machine === "function" ? machine() : machine
-    return context ? _machine.withContext(context) : _machine
+    const contextValue = typeof context === "function" ? context() : context
+    return contextValue ? _machine.withContext(contextValue) : _machine
   })()
 
   onMount(() => {
@@ -35,7 +36,8 @@ export function useService<
   })
 
   createEffect(() => {
-    service.setContext(context)
+    const contextValue = typeof context === "function" ? context() : context
+    service.setContext(contextValue)
   })
 
   createEffect(() => {

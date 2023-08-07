@@ -20,15 +20,19 @@ const fetchMachine = createMachine({
     "!selectOnFocus": false,
     "selectOnFocus": false
   },
+  entry: ["checkRenderedElements", "syncIndicatorRect", "setContentTabIndex"],
+  exit: ["cleanupObserver"],
   on: {
     SET_VALUE: {
       actions: "setValue"
     },
     CLEAR_VALUE: {
       actions: "clearValue"
+    },
+    SET_INDICATOR_RECT: {
+      actions: "setIndicatorRect"
     }
   },
-  entry: ["checkRenderedElements", "setIndicatorRect", "setContentTabIndex"],
   on: {
     UPDATE_CONTEXT: {
       actions: "updateContext"
@@ -37,11 +41,14 @@ const fetchMachine = createMachine({
   states: {
     idle: {
       on: {
-        TAB_FOCUS: {
+        TAB_FOCUS: [{
           cond: "selectOnFocus",
           target: "focused",
           actions: ["setFocusedValue", "setValue"]
-        },
+        }, {
+          target: "focused",
+          actions: "setFocusedValue"
+        }],
         TAB_CLICK: {
           target: "focused",
           actions: ["setFocusedValue", "setValue"]

@@ -1,7 +1,7 @@
-import type { Boundary, Placement, ComputePositionReturn, ComputePositionConfig } from "@floating-ui/dom"
+import type { Boundary, ComputePositionReturn, Placement } from "@floating-ui/dom"
 import type { AutoUpdateOptions } from "./auto-update"
 
-export type { Placement }
+export type { Placement, Boundary, ComputePositionReturn, AutoUpdateOptions }
 
 export type PositioningOptions = {
   /**
@@ -52,11 +52,7 @@ export type PositioningOptions = {
   /**
    * Function called when the placement is computed
    */
-  onComplete?(
-    data: ComputePositionReturn & {
-      compute: (config?: Omit<ComputePositionConfig, "platform">) => void
-    },
-  ): void
+  onComplete?(data: ComputePositionReturn): void
   /**
    * Function called on cleanup of all listeners
    */

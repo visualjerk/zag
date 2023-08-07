@@ -11,7 +11,7 @@ const {
 } = actions;
 const fetchMachine = createMachine({
   id: "dialog",
-  initial: ctx.defaultOpen ? "open" : "closed",
+  initial: ctx.open ? "open" : "closed",
   context: {},
   on: {
     UPDATE_CONTEXT: {
@@ -25,11 +25,11 @@ const fetchMachine = createMachine({
       on: {
         CLOSE: {
           target: "closed",
-          actions: ["invokeOnClose"]
+          actions: ["invokeOnClose", "restoreFocus"]
         },
         TOGGLE: {
           target: "closed",
-          actions: ["invokeOnClose"]
+          actions: ["invokeOnClose", "restoreFocus"]
         }
       }
     },

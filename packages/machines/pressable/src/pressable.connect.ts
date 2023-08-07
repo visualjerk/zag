@@ -1,10 +1,11 @@
-import { contains, dataAttr, getNativeEvent, isVirtualClick, isVirtualPointerEvent } from "@zag-js/dom-utils"
-import { NormalizeProps, PropTypes } from "@zag-js/types"
+import { getNativeEvent, isVirtualClick, isVirtualPointerEvent } from "@zag-js/dom-event"
+import { contains, dataAttr } from "@zag-js/dom-query"
+import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { dom } from "./pressable.dom"
-import { Send, State } from "./pressable.types"
-import { utils } from "./pressable.utils"
+import type { PublicApi, Send, State } from "./pressable.types"
+import { isValidKeyboardEvent, shouldPreventDefault, shouldPreventDefaultKeyboard } from "./pressable.utils"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isPressed = state.hasTag("pressed")
   const isDisabled = state.context.disabled
   return {
@@ -16,24 +17,17 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       onKeyDown(event) {
         const evt = getNativeEvent(event)
 
-        if (!utils.isValidKeyboardEvent(evt)) return
+        if (!isValidKeyboardEvent(evt)) return
         if (!contains(event.currentTarget, event.target)) return
 
         if (!event.repeat) {
-          send({ type: "KEY_DOWN", event, pointerType: "keyboard" })
+          const currentTarget = event.currentTarget
+          send({ type: "KEY_DOWN", currentTarget, pointerType: "keyboard" })
         }
 
-        if (utils.shouldPreventDefaultKeyboard(event.target as Element)) {
+        if (shouldPreventDefaultKeyboard(event.target)) {
           event.preventDefault()
         }
-      },
-      onKeyUp(event) {
-        const evt = getNativeEvent(event)
-
-        if (!utils.isValidKeyboardEvent(evt) || event.repeat) return
-        if (!contains(event.currentTarget, event.target)) return
-
-        send({ type: "KEY_UP", event, pointerType: "keyboard" })
       },
       onClick(event) {
         const evt = getNativeEvent(event)
@@ -46,35 +40,40 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         }
 
         const isVirtual = ctx.pointerType === "virtual" || isVirtualClick(evt)
+
         if (!ctx.ignoreClickAfterPress && isVirtual) {
-          send({ type: "CLICK", event, pointerType: "virtual" })
+          const currentTarget = event.currentTarget
+          send({ type: "CLICK", currentTarget, pointerType: "virtual" })
         }
       },
       onPointerDown(event) {
-        if (state.context.disabled) {
-          return
-        }
+        if (isDisabled) return
 
         if (event.button !== 0 || !contains(event.currentTarget, event.target)) {
           return
         }
 
-        if (utils.shouldPreventDefault(event.currentTarget)) {
+        if (shouldPreventDefault(event.currentTarget)) {
           event.preventDefault()
         }
 
         const evt = getNativeEvent(event)
+
         const pointerType = isVirtualPointerEvent(evt) ? "virtual" : event.pointerType
-        send({ type: "POINTER_DOWN", event, pointerType })
+        const pointerId = evt.pointerId
+        const currentTarget = event.currentTarget
+
+        send({ type: "POINTER_DOWN", currentTarget, pointerType, pointerId })
       },
       onMouseDown(event) {
         if (event.button !== 0) return
-        if (utils.shouldPreventDefault(event.currentTarget)) {
+        if (shouldPreventDefault(event.currentTarget)) {
           event.preventDefault()
         }
       },
       onDragStart(event) {
-        send({ type: "DRAG_START", event })
+        const currentTarget = event.currentTarget
+        send({ type: "DRAG_START", currentTarget })
       },
     }),
   }

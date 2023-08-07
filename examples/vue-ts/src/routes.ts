@@ -4,7 +4,12 @@ import Home from "./pages/index"
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: "/transition", component: () => import("./pages/transition") },
+    { path: "/file-upload", component: () => import("./pages/file-upload") },
+    { path: "/presence", component: () => import("./pages/presence") },
+    { path: "/avatar", component: () => import("./pages/avatar") },
+    { path: "/color-picker", component: () => import("./pages/color-picker") },
+    { path: "/switch", component: () => import("./pages/switch") },
+    { path: "/carousel", component: () => import("./pages/carousel") },
     { path: "/date-picker", component: () => import("./pages/date-picker") },
     { path: "/select", component: () => import("./pages/select") },
     {
@@ -34,7 +39,10 @@ export const router = createRouter({
     { path: "/radio-group", component: () => import("./pages/radio-group") },
     { path: "/rating-group", component: () => import("./pages/rating-group") },
     { path: "/slider", component: () => import("./pages/slider") },
+    { path: "/segment-control", component: () => import("./pages/segment-control") },
     { path: "/tabs", component: () => import("./pages/tabs") },
+    { path: "/toggle", component: () => import("./pages/toggle") },
+    { path: "/toggle-group", component: () => import("./pages/toggle-group") },
     { path: "/tags-input", component: () => import("./pages/tags-input") },
     { path: "/toast", component: () => import("./pages/toast") },
     { path: "/tooltip", component: () => import("./pages/tooltip") },

@@ -1,11 +1,13 @@
 import { createMachine } from "@zag-js/core"
-import { contains, findByTypeahead, observeAttributes, raf } from "@zag-js/dom-utils"
+import { trackDismissableElement } from "@zag-js/dismissable"
+import { getByTypeahead, raf } from "@zag-js/dom-query"
 import { setElementValue, trackFormControl } from "@zag-js/form-utils"
-import { trackInteractOutside } from "@zag-js/interact-outside"
+import { observeAttributes } from "@zag-js/mutation-observer"
 import { getPlacement } from "@zag-js/popper"
+import { proxyTabFocus } from "@zag-js/tabbable"
 import { compact, json } from "@zag-js/utils"
 import { dom } from "./select.dom"
-import { MachineContext, MachineState, UserDefinedContext } from "./select.types"
+import type { MachineContext, MachineState, UserDefinedContext } from "./select.types"
 
 export function machine(userContext: UserDefinedContext) {
   const ctx = compact(userContext)
@@ -22,7 +24,7 @@ export function machine(userContext: UserDefinedContext) {
         initialSelectedOption: null,
         prevSelectedOption: null,
         prevHighlightedOption: null,
-        typeahead: findByTypeahead.defaultOptions,
+        typeahead: getByTypeahead.defaultOptions,
         positioning: {
           placement: "bottom-start",
           gutter: 8,
@@ -137,7 +139,7 @@ export function machine(userContext: UserDefinedContext) {
           tags: ["open"],
           entry: ["focusContent", "highlightSelectedOption", "invokeOnOpen"],
           exit: ["scrollContentToTop"],
-          activities: ["trackInteractOutside", "computePlacement", "scrollToHighlightedOption"],
+          activities: ["trackInteractOutside", "computePlacement", "scrollToHighlightedOption", "proxyTabFocus"],
           on: {
             CLOSE: {
               target: "focused",
@@ -167,10 +169,6 @@ export function machine(userContext: UserDefinedContext) {
                 actions: ["selectHighlightedOption", "invokeOnSelect"],
               },
             ],
-            ESC_KEY: {
-              target: "focused",
-              actions: ["invokeOnClose"],
-            },
             BLUR: {
               target: "focused",
               actions: ["invokeOnClose"],
@@ -231,6 +229,14 @@ export function machine(userContext: UserDefinedContext) {
         closeOnSelect: (ctx) => !!ctx.closeOnSelect,
       },
       activities: {
+        proxyTabFocus(ctx) {
+          return proxyTabFocus(dom.getContentElement(ctx), {
+            triggerElement: dom.getTriggerElement(ctx),
+            onFocus(el: HTMLElement) {
+              raf(() => el.focus({ preventScroll: true }))
+            },
+          })
+        },
         trackFormControlState(ctx) {
           return trackFormControl(dom.getHiddenSelectElement(ctx), {
             onFieldsetDisabled() {
@@ -243,13 +249,17 @@ export function machine(userContext: UserDefinedContext) {
           })
         },
         trackInteractOutside(ctx, _evt, { send }) {
-          return trackInteractOutside(dom.getContentElement(ctx), {
-            exclude(target) {
-              const ignore = [dom.getTriggerElement(ctx)]
-              return ignore.some((el) => contains(el, target))
+          let focusable = false
+          return trackDismissableElement(dom.getContentElement(ctx), {
+            exclude: [dom.getTriggerElement(ctx)],
+            onFocusOutside: ctx.onFocusOutside,
+            onPointerDownOutside: ctx.onPointerDownOutside,
+            onInteractOutside(event) {
+              focusable = event.detail.focusable
+              ctx.onInteractOutside?.(event)
             },
-            onInteractOutside() {
-              send({ type: "BLUR", src: "interact-outside" })
+            onDismiss() {
+              send({ type: "BLUR", src: "interact-outside", focusable })
             },
           })
         },
@@ -275,7 +285,7 @@ export function machine(userContext: UserDefinedContext) {
             exec()
           })
 
-          return observeAttributes(dom.getContentElement(ctx), "aria-activedescendant", exec)
+          return observeAttributes(dom.getContentElement(ctx), ["aria-activedescendant"], exec)
         },
       },
       actions: {
@@ -305,9 +315,10 @@ export function machine(userContext: UserDefinedContext) {
             dom.getContentElement(ctx)?.focus({ preventScroll: true })
           })
         },
-        focusTrigger(ctx) {
+        focusTrigger(ctx, evt) {
+          if (evt.focusable) return
           raf(() => {
-            dom.getTriggerElement(ctx).focus({ preventScroll: true })
+            dom.getTriggerElement(ctx)?.focus({ preventScroll: true })
           })
         },
         selectHighlightedOption(ctx, evt) {

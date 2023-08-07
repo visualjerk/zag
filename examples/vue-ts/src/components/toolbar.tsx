@@ -1,16 +1,16 @@
-import { dataAttr } from "@zag-js/dom-utils"
+import { dataAttr } from "@zag-js/dom-query"
 import { defineComponent, ref } from "vue"
 
 export const Toolbar = defineComponent({
-  props: ["controls"],
+  props: ["controls", "viz"],
   setup(props, { slots }) {
-    const activeState = ref(props.controls === null ? 1 : 0)
+    const activeState = ref(props.viz ? 1 : !props.controls ? 1 : 0)
 
     return () => {
       return (
         <div class="toolbar">
           <nav>
-            {props.controls !== null && (
+            {props.controls && (
               <button
                 data-active={dataAttr(activeState.value === 0)}
                 onClick={() => {

@@ -1,7 +1,7 @@
 import type { StateMachine as S } from "@zag-js/core"
 import type { DismissableElementHandlers } from "@zag-js/dismissable"
-import type { PositioningOptions, Placement } from "@zag-js/popper"
-import type { CommonProperties, Context, MaybeElement, RequiredBy } from "@zag-js/types"
+import type { Placement, PositioningOptions } from "@zag-js/popper"
+import type { CommonProperties, Context, MaybeElement, PropTypes, RequiredBy } from "@zag-js/types"
 
 type ElementIds = Partial<{
   anchor: string
@@ -10,6 +10,8 @@ type ElementIds = Partial<{
   title: string
   description: string
   closeTrigger: string
+  positioner: string
+  arrow: string
 }>
 
 type PublicContext = DismissableElementHandlers &
@@ -30,6 +32,8 @@ type PublicContext = DismissableElementHandlers &
     modal?: boolean
     /**
      * Whether the popover is rendered in a portal
+     *
+     * @default true
      */
     portalled?: boolean
     /**
@@ -50,18 +54,54 @@ type PublicContext = DismissableElementHandlers &
      */
     closeOnEsc?: boolean
     /**
-     * Function invoked when the popover is opened.
+     * Function invoked when the popover is closed
      */
-    onOpenChange?: (open: boolean) => void
+    onClose?: VoidFunction
+    /**
+     * Function invoked when the popover is opened
+     */
+    onOpen?: VoidFunction
     /**
      * The user provided options used to position the popover content
      */
     positioning: PositioningOptions
     /**
-     * Whether to open the popover on page load
+     * Whether the popover is open
      */
-    defaultOpen?: boolean
+    open?: boolean
   }
+
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * Whether the popover is portalled
+   */
+  portalled: boolean
+  /**
+   * Whether the popover is open
+   */
+  isOpen: boolean
+  /**
+   * Function to open the popover
+   */
+  open(): void
+  /**
+   * Function to close the popover
+   */
+  close(): void
+  /**
+   * Function to reposition the popover
+   */
+  setPositioning(options?: Partial<PositioningOptions>): void
+  arrowProps: T["element"]
+  arrowTipProps: T["element"]
+  anchorProps: T["element"]
+  triggerProps: T["button"]
+  positionerProps: T["element"]
+  contentProps: T["element"]
+  titleProps: T["element"]
+  descriptionProps: T["element"]
+  closeTriggerProps: T["button"]
+}
 
 export type UserDefinedContext = RequiredBy<PublicContext, "id">
 
@@ -81,22 +121,12 @@ type PrivateContext = Context<{
   renderedElements: {
     title: boolean
     description: boolean
-    anchor: boolean
   }
   /**
    * @internal
    * The computed placement (maybe different from initial placement)
    */
   currentPlacement?: Placement
-  /**
-   * @internal
-   * Whether the dynamic placement has been computed
-   */
-  isPlacementComplete?: boolean
-  /**
-   * Whether to prevent returning focus to the trigger
-   */
-  focusTriggerOnClose?: boolean
 }>
 
 export type MachineContext = PublicContext & ComputedContext & PrivateContext
@@ -108,3 +138,5 @@ export type MachineState = {
 export type State = S.State<MachineContext, MachineState>
 
 export type Send = S.Send<S.AnyEventObject>
+
+export type { Placement, PositioningOptions }

@@ -1,4 +1,4 @@
-import { isDom } from "@zag-js/dom-utils"
+import { isDom } from "@zag-js/dom-query"
 import { warn } from "@zag-js/utils"
 import { groupConnect, toaster } from "./toast-group.connect"
 import { groupMachine } from "./toast-group.machine"
@@ -11,6 +11,7 @@ export type {
   MachineContext,
   MachineState,
   Placement,
+  PublicApi,
   Service,
   ToastOptions,
   Type,

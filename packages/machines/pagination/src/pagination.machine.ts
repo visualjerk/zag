@@ -1,6 +1,6 @@
 import { createMachine } from "@zag-js/core"
 import { compact } from "@zag-js/utils"
-import { MachineContext, MachineState, UserDefinedContext } from "./pagination.types"
+import type { MachineContext, MachineState, UserDefinedContext } from "./pagination.types"
 
 export function machine(userContext: UserDefinedContext) {
   const ctx = compact(userContext)
@@ -12,12 +12,16 @@ export function machine(userContext: UserDefinedContext) {
         pageSize: 10,
         siblingCount: 1,
         page: 1,
+        type: "button",
         translations: {
           rootLabel: "pagination",
+          prevPageTriggerLabel: "previous page",
+          nextPageTriggerLabel: "next page",
           pageTriggerLabel({ page, totalPages }) {
             const isLastPage = totalPages > 1 && page === totalPages
             return `${isLastPage ? "last page, " : ""}page ${page}`
           },
+          ...ctx.translations,
         },
         ...ctx,
       },

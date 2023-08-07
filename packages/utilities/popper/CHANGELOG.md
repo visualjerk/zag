@@ -1,5 +1,192 @@
 # @zag-js/popper
 
+## 0.13.0
+
+### Patch Changes
+
+- [`e2cb53c7`](https://github.com/chakra-ui/zag/commit/e2cb53c7c7a9dc2b1d462ad4e85d25f7e718d848) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Fix issue where `sameWidth` doesn't work consistently in Vue.js
+  and Solid.js during re-render.
+
+- Updated dependencies []:
+  - @zag-js/utils@0.13.0
+  - @zag-js/dom-query@0.13.0
+  - @zag-js/element-rect@0.13.0
+
+## 0.12.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.12.0
+  - @zag-js/dom-query@0.12.0
+  - @zag-js/element-rect@0.12.0
+
+## 0.11.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.11.2
+  - @zag-js/dom-query@0.11.2
+  - @zag-js/element-rect@0.11.2
+
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.11.1
+  - @zag-js/dom-query@0.11.1
+  - @zag-js/element-rect@0.11.1
+
+## 0.11.0
+
+### Patch Changes
+
+- [`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Rebuild all packages using tsup
+
+- Updated dependencies [[`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce)]:
+  - @zag-js/element-rect@0.11.0
+  - @zag-js/dom-query@0.11.0
+  - @zag-js/utils@0.11.0
+
+## 0.10.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.10.5
+  - @zag-js/dom-query@0.10.5
+  - @zag-js/element-rect@0.10.5
+
+## 0.10.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.10.4
+  - @zag-js/dom-query@0.10.4
+  - @zag-js/element-rect@0.10.4
+
+## 0.10.3
+
+### Patch Changes
+
+- [#695](https://github.com/chakra-ui/zag/pull/695)
+  [`6344f8a1`](https://github.com/chakra-ui/zag/commit/6344f8a11aa0f6d5f633431ce47519d74e35b62b) Thanks
+  [@malangcat](https://github.com/malangcat)! - fix(popper): offset is ignored from default gutter
+
+- [`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Use vite to build packages
+
+- Updated dependencies [[`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7),
+  [`775f11c9`](https://github.com/chakra-ui/zag/commit/775f11c96759197fcbad14b5b8a0fbde095efc55)]:
+  - @zag-js/utils@0.10.3
+  - @zag-js/dom-query@0.10.3
+  - @zag-js/element-rect@0.10.3
+
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.10.2
+  - @zag-js/dom-query@0.10.2
+  - @zag-js/element-rect@0.10.2
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.10.1
+  - @zag-js/dom-query@0.10.1
+  - @zag-js/element-rect@0.10.1
+
+## 0.10.0
+
+### Patch Changes
+
+- Updated dependencies [[`e8ac03ef`](https://github.com/chakra-ui/zag/commit/e8ac03ef4b820773a5875db861735e2aac8f29da)]:
+  - @zag-js/dom-query@0.10.0
+  - @zag-js/utils@0.10.0
+  - @zag-js/element-rect@0.10.0
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.9.2
+  - @zag-js/dom-query@0.9.2
+  - @zag-js/element-rect@0.9.2
+
+## 0.9.1
+
+### Patch Changes
+
+- [`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Force release every package to fix regression
+
+- Updated dependencies [[`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f)]:
+  - @zag-js/utils@0.9.1
+  - @zag-js/dom-query@0.9.1
+  - @zag-js/element-rect@0.9.1
+
+## 0.8.0
+
+### Patch Changes
+
+- [`fb4fb42d`](https://github.com/chakra-ui/zag/commit/fb4fb42d8aacc5844945dd7b1bd27b94c978ca4e) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add support for `defer` option to allow defering the execution of
+  a function to the next tick
+
+- Updated dependencies [[`bf136f6e`](https://github.com/chakra-ui/zag/commit/bf136f6ef8c9499bd0fbc4be057d02697e97a010)]:
+  - @zag-js/element-rect@0.8.0
+
+## 0.2.7
+
+### Patch Changes
+
+- [`fa2ecc8e`](https://github.com/chakra-ui/zag/commit/fa2ecc8ea235b824f45deda10070c321f896886c) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - - Simplify `getPlacementStyles` logic
+  - Fix issue where `autoUpdate` prevented manual positioning updates from working due to rect tracking.
+- Updated dependencies [[`30dbeb28`](https://github.com/chakra-ui/zag/commit/30dbeb282f7901c33518097a0e1dd9a857f7efb0),
+  [`fa2ecc8e`](https://github.com/chakra-ui/zag/commit/fa2ecc8ea235b824f45deda10070c321f896886c)]:
+  - @zag-js/utils@0.3.4
+  - @zag-js/element-rect@0.3.0
+
+## 0.2.6
+
+### Patch Changes
+
+- [`fefa5098`](https://github.com/chakra-ui/zag/commit/fefa5098f400ee6b04e5636c8b0b016dca5b2360) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Bump `@floating-ui/dom` dependency
+
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [[`1446d88b`](https://github.com/chakra-ui/zag/commit/1446d88bff3848f2a2ec0a793ee83281cda966e8)]:
+  - @zag-js/dom-query@0.1.4
+
+## 0.2.4
+
+### Patch Changes
+
+- [#536](https://github.com/chakra-ui/zag/pull/536)
+  [`aabc9aed`](https://github.com/chakra-ui/zag/commit/aabc9aed93ae3f49e2cec8d8b28edd23a337ce99) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Refactor all packages to have proper dependency structure and
+  bundle size.
+
+- [`5277f653`](https://github.com/chakra-ui/zag/commit/5277f65311c46e5792f605021d58b3b7e7dc3eaa) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Update dependencies to latest versions
+
+- Updated dependencies [[`aabc9aed`](https://github.com/chakra-ui/zag/commit/aabc9aed93ae3f49e2cec8d8b28edd23a337ce99)]:
+  - @zag-js/dom-query@0.1.3
+
 ## 0.2.3
 
 ### Patch Changes

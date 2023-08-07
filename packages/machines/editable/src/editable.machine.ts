@@ -1,5 +1,5 @@
 import { createMachine, guards } from "@zag-js/core"
-import { contains, raf } from "@zag-js/dom-utils"
+import { contains, raf } from "@zag-js/dom-query"
 import { trackInteractOutside } from "@zag-js/interact-outside"
 import { compact } from "@zag-js/utils"
 import { dom } from "./editable.dom"
@@ -52,22 +52,25 @@ export function machine(userContext: UserDefinedContext) {
           // // https://bugzilla.mozilla.org/show_bug.cgi?id=559561
           entry: ["blurInputIfNeeded"],
           on: {
-            EDIT: "edit",
+            EDIT: {
+              target: "edit",
+              actions: ["focusInput", "invokeOnEdit"],
+            },
             DBLCLICK: {
               guard: "activateOnDblClick",
               target: "edit",
+              actions: ["focusInput", "invokeOnEdit"],
             },
             FOCUS: {
               guard: "activateOnFocus",
               target: "edit",
-              actions: "setPreviousValue",
+              actions: ["setPreviousValue", "focusInput", "invokeOnEdit"],
             },
           },
         },
 
         edit: {
           activities: ["trackInteractOutside"],
-          entry: ["focusInput", "invokeOnEdit"],
           on: {
             TYPE: {
               guard: not("isAtMaxLength"),
@@ -77,25 +80,25 @@ export function machine(userContext: UserDefinedContext) {
               {
                 guard: "submitOnBlur",
                 target: "preview",
-                actions: ["focusEditTrigger", "invokeOnSubmit"],
+                actions: ["restoreFocus", "invokeOnSubmit"],
               },
               {
                 target: "preview",
-                actions: ["resetValueIfNeeded", "focusEditTrigger", "invokeOnCancel"],
+                actions: ["revertValue", "restoreFocus", "invokeOnCancel"],
               },
             ],
             CANCEL: {
               target: "preview",
-              actions: ["focusEditTrigger", "resetValueIfNeeded", "invokeOnCancel"],
+              actions: ["revertValue", "restoreFocus", "invokeOnCancel"],
             },
             ENTER: {
               guard: "submitOnEnter",
               target: "preview",
-              actions: ["setPreviousValue", "invokeOnSubmit", "focusEditTrigger"],
+              actions: ["setPreviousValue", "invokeOnSubmit", "restoreFocus"],
             },
             SUBMIT: {
               target: "preview",
-              actions: ["setPreviousValue", "invokeOnSubmit", "focusEditTrigger"],
+              actions: ["setPreviousValue", "invokeOnSubmit", "restoreFocus"],
             },
           },
         },
@@ -117,25 +120,36 @@ export function machine(userContext: UserDefinedContext) {
               const ignore = [dom.getCancelTriggerEl(ctx), dom.getSubmitTriggerEl(ctx)]
               return ignore.some((el) => contains(el, target))
             },
-            onInteractOutside() {
-              send({ type: "BLUR", src: "interact-outside" })
+            onFocusOutside: ctx.onFocusOutside,
+            onPointerDownOutside: ctx.onPointerDownOutside,
+            onInteractOutside(event) {
+              ctx.onInteractOutside?.(event)
+              if (event.defaultPrevented) return
+              const { focusable } = event.detail
+              send({ type: "BLUR", src: "interact-outside", focusable })
             },
           })
         },
       },
 
       actions: {
-        focusEditTrigger(ctx) {
+        restoreFocus(ctx, evt) {
+          if (evt.focusable) return
           raf(() => {
-            dom.getEditTriggerEl(ctx)?.focus()
+            const finalEl = ctx.finalFocusEl?.() ?? dom.getEditTriggerEl(ctx)
+            finalEl?.focus({ preventScroll: true })
           })
         },
         focusInput(ctx) {
           raf(() => {
             const input = dom.getInputEl(ctx)
             if (!input) return
-            if (ctx.selectOnFocus) input.select()
-            else input.focus()
+
+            if (ctx.selectOnFocus) {
+              input.select()
+            } else {
+              input.focus({ preventScroll: true })
+            }
           })
         },
         invokeOnCancel(ctx) {
@@ -161,8 +175,7 @@ export function machine(userContext: UserDefinedContext) {
         setPreviousValue(ctx) {
           ctx.previousValue = ctx.value
         },
-        resetValueIfNeeded(ctx) {
-          if (!ctx.previousValue) return
+        revertValue(ctx) {
           ctx.value = ctx.previousValue
         },
         blurInputIfNeeded(ctx) {

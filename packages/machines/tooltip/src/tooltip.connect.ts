@@ -1,12 +1,12 @@
-import { dataAttr, visuallyHiddenStyle } from "@zag-js/dom-utils"
-import { getPlacementStyles } from "@zag-js/popper"
+import { dataAttr } from "@zag-js/dom-query"
+import { getPlacementStyles, type PositioningOptions } from "@zag-js/popper"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./tooltip.anatomy"
 import { dom } from "./tooltip.dom"
 import { store } from "./tooltip.store"
-import type { Send, State } from "./tooltip.types"
+import type { PublicApi, Send, State } from "./tooltip.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const id = state.context.id
   const hasAriaLabel = state.context.hasAriaLabel
 
@@ -18,7 +18,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
   const isDisabled = state.context.disabled
 
   const popperStyles = getPlacementStyles({
-    measured: !!state.context.isPlacementComplete,
+    ...state.context.positioning,
     placement: state.context.currentPlacement,
   })
 
@@ -30,17 +30,15 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     close() {
       send("CLOSE")
     },
-    getAnimationState() {
-      return {
-        enter: store.prevId === null && id === store.id,
-        exit: store.id === null,
-      }
+    setPositioning(options: Partial<PositioningOptions> = {}) {
+      send({ type: "SET_POSITIONING", options })
     },
 
     triggerProps: normalize.button({
       ...parts.trigger.attrs,
       id: triggerId,
       "data-expanded": dataAttr(isOpen),
+      "data-state": isOpen ? "open" : "closed",
       "aria-describedby": isOpen ? contentId : undefined,
       onClick() {
         send("CLICK")
@@ -59,9 +57,9 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
           send("POINTER_DOWN")
         }
       },
-      onPointerMove() {
-        if (isDisabled) return
-        send("POINTER_ENTER")
+      onPointerMove(event) {
+        if (isDisabled || event.pointerType === "touch") return
+        send("POINTER_MOVE")
       },
       onPointerLeave() {
         if (isDisabled) return
@@ -93,26 +91,19 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     contentProps: normalize.element({
       ...parts.content.attrs,
       hidden: !isOpen,
+      "data-state": isOpen ? "open" : "closed",
       role: hasAriaLabel ? undefined : "tooltip",
       id: hasAriaLabel ? undefined : contentId,
       "data-placement": state.context.currentPlacement,
       onPointerEnter() {
-        send("TOOLTIP_POINTER_ENTER")
+        send("CONTENT.POINTER_MOVE")
       },
       onPointerLeave() {
-        send("TOOLTIP_POINTER_LEAVE")
+        send("CONTENT.POINTER_LEAVE")
       },
       style: {
         pointerEvents: state.context.interactive ? "auto" : "none",
       },
-    }),
-
-    labelProps: normalize.element({
-      ...parts.label.attrs,
-      id: contentId,
-      role: "tooltip",
-      style: visuallyHiddenStyle,
-      children: state.context["aria-label"],
     }),
   }
 }

@@ -1,10 +1,11 @@
-import { ariaAttr, dataAttr, EventKeyMap } from "@zag-js/dom-utils"
+import type { EventKeyMap } from "@zag-js/dom-event"
+import { ariaAttr, dataAttr } from "@zag-js/dom-query"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./editable.anatomy"
 import { dom } from "./editable.dom"
-import type { Send, State } from "./editable.types"
+import type { PublicApi, Send, State } from "./editable.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isDisabled = state.context.disabled
   const isInteractive = state.context.isInteractive
   const isReadOnly = state.context.readOnly
@@ -24,20 +25,27 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     isEditing,
     isValueEmpty: isValueEmpty,
     value: state.context.value,
+
     setValue(value: string) {
       send({ type: "SET_VALUE", value })
     },
+
     clearValue() {
       send({ type: "SET_VALUE", value: "" })
     },
+
     edit() {
       if (!isInteractive) return
       send("EDIT")
     },
+    /**
+     * Function to exit edit mode, and discard any changes
+     */
     cancel() {
       if (!isInteractive) return
       send("CANCEL")
     },
+
     submit() {
       if (!isInteractive) return
       send("SUBMIT")

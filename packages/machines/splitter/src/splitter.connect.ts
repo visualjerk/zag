@@ -1,31 +1,50 @@
-import { dataAttr, EventKeyMap, getEventKey, getEventStep } from "@zag-js/dom-utils"
+import { getEventKey, getEventStep, type EventKeyMap } from "@zag-js/dom-event"
+import { dataAttr } from "@zag-js/dom-query"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./splitter.anatomy"
 import { dom } from "./splitter.dom"
-import type { PanelId, PanelProps, ResizeTriggerProps, Send, State } from "./splitter.types"
+import type { PanelId, PanelProps, PublicApi, ResizeTriggerProps, Send, State } from "./splitter.types"
 import { getHandleBounds } from "./splitter.utils"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isHorizontal = state.context.isHorizontal
   const isFocused = state.hasTag("focus")
   const isDragging = state.matches("dragging")
+  const panels = state.context.panels
 
   const api = {
     isFocused,
     isDragging,
     bounds: getHandleBounds(state.context),
 
-    collapse(id: PanelId) {
-      send({ type: "COLLAPSE", id })
+    setToMinSize(id: PanelId) {
+      const panel = panels.find((panel) => panel.id === id)
+      send({ type: "SET_PANEL_SIZE", id, size: panel?.minSize, src: "setToMinSize" })
     },
-    expand(id: PanelId) {
-      send({ type: "EXPAND", id })
+
+    setToMaxSize(id: PanelId) {
+      const panel = panels.find((panel) => panel.id === id)
+      send({ type: "SET_PANEL_SIZE", id, size: panel?.maxSize, src: "setToMaxSize" })
     },
-    toggle(id: PanelId) {
-      send({ type: "TOGGLE", id })
-    },
+
     setSize(id: PanelId, size: number) {
-      send({ type: "SET_SIZE", id, size })
+      send({ type: "SET_PANEL_SIZE", id, size })
+    },
+
+    getResizeTriggerState(props: ResizeTriggerProps) {
+      const { id, disabled } = props
+      const ids = id.split(":")
+      const panelIds = ids.map((id) => dom.getPanelId(state.context, id))
+      const panels = getHandleBounds(state.context, id)
+
+      return {
+        isDisabled: !!disabled,
+        isFocused: state.context.activeResizeId === id && isFocused,
+        panelIds,
+        min: panels?.min,
+        max: panels?.max,
+        value: 0,
+      }
     },
 
     rootProps: normalize.element({
@@ -51,31 +70,6 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         "data-ownedby": dom.getRootId(state.context),
         style: dom.getPanelStyle(state.context, id),
       })
-    },
-
-    // toggleTriggerProps: normalize.element({
-    //   ...parts.toggleButton.attrs,
-    //   id: dom.getToggleButtonId(state.context),
-    //   "aria-label": state.context.isAtMin ? "Expand Primary Pane" : "Collapse Primary Pane",
-    //   onClick() {
-    //     send("TOGGLE")
-    //   },
-    // }),
-
-    getResizeTriggerState(props: ResizeTriggerProps) {
-      const { id, disabled } = props
-      const ids = id.split(":")
-      const panelIds = ids.map((id) => dom.getPanelId(state.context, id))
-      const panels = getHandleBounds(state.context, id)
-
-      return {
-        isDisabled: !!disabled,
-        isFocused: state.context.activeResizeId === id && isFocused,
-        panelIds,
-        min: panels?.min,
-        max: panels?.max,
-        value: 0,
-      }
     },
 
     getResizeTriggerProps(props: ResizeTriggerProps) {

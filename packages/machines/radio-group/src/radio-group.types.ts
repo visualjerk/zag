@@ -1,9 +1,10 @@
 import type { StateMachine as S } from "@zag-js/core"
-import type { CommonProperties, Context, DirectionProperty, RequiredBy } from "@zag-js/types"
+import type { CommonProperties, Context, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
 
 type ElementIds = Partial<{
   root: string
   label: string
+  indicator: string
   radio(value: string): string
   radioLabel(value: string): string
   radioControl(value: string): string
@@ -48,13 +49,51 @@ type PublicContext = DirectionProperty &
      */
     orientation?: "horizontal" | "vertical"
   }
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * The current value of the radio group
+   */
+  value: string | null
+  /**
+   * Function to set the value of the radio group
+   */
+  setValue(value: string): void
+  /**
+   * Function to clear the value of the radio group
+   */
+  clearValue(): void
+  /**
+   * Function to focus the radio group
+   */
+  focus: () => void
+  /**
+   * Function to blur the currently focused radio input in the radio group
+   */
+  blur(): void
+  /**
+   * Returns the state details of a radio input
+   */
+  getRadioState: <T_1 extends RadioProps>(
+    props: T_1,
+  ) => {
+    isInteractive: boolean
+    isInvalid: boolean | undefined
+    isDisabled: boolean | undefined
+    isChecked: boolean
+    isFocused: boolean
+    isHovered: boolean
+    isActive: boolean
+  }
+  rootProps: T["element"]
+  labelProps: T["element"]
+  getRadioProps(props: RadioProps): T["label"]
+  getRadioLabelProps(props: RadioProps): T["element"]
+  getRadioControlProps(props: RadioProps): T["element"]
+  getRadioInputProps(props: InputProps): T["input"]
+  indicatorProps: T["element"]
+}
 
 type PrivateContext = Context<{
-  /**
-   * @internal
-   * The initial radio value.
-   */
-  initialValue: string | null
   /**
    * @internal
    * The id of the active radio
@@ -70,6 +109,21 @@ type PrivateContext = Context<{
    * The id of the hovered radio
    */
   hoveredId: string | null
+  /**
+   * @internal
+   * The active tab indicator's dom rect
+   */
+  indicatorRect?: Partial<{ left: string; top: string; width: string; height: string }>
+  /**
+   * @internal
+   * Whether the active tab indicator's rect can transition
+   */
+  canIndicatorTransition?: boolean
+  /**
+   * @internal
+   * Function to clean up the observer for the active tab's rect
+   */
+  indicatorCleanup?: VoidFunction | null
 }>
 
 export type UserDefinedContext = RequiredBy<PublicContext, "id">

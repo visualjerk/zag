@@ -1,6 +1,6 @@
 {
   "name": "@zag-js/types",
-  "version": "0.3.4",
+  "version": "0.13.0",
   "keywords": [
     "js",
     "utils",
@@ -12,7 +12,8 @@
   "repository": "https://github.com/chakra-ui/zag/tree/main/packages/utilities/types",
   "sideEffects": false,
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "publishConfig": {
     "access": "public"
@@ -21,16 +22,12 @@
     "url": "https://github.com/chakra-ui/zag/issues"
   },
   "dependencies": {
-    "csstype": "3.1.1"
+    "csstype": "3.1.2"
   },
   "scripts": {
-    "build-fast": "tsup src",
-    "start": "pnpm build --watch",
-    "build": "tsup src --dts",
+    "build": "tsup",
     "test": "jest --config ../../jest.config.js --rootDir . --passWithNoTests",
     "lint": "eslint src --ext .ts,.tsx",
-    "test-ci": "pnpm test --ci --runInBand",
-    "test-watch": "pnpm test --watch -u",
     "typecheck": "tsc --noEmit",
     "prepack": "clean-package",
     "postpack": "clean-package restore"

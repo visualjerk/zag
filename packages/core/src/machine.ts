@@ -18,8 +18,16 @@ import { deepMerge } from "./deep-merge"
 import { determineDelayFn } from "./delay-utils"
 import { determineActionsFn, determineGuardFn } from "./guard-utils"
 import { determineTransitionFn } from "./transition-utils"
-import { ActionTypes, Dict, MachineStatus, MachineType, StateMachine as S, VoidFunction, Writable } from "./types"
-import { cloneFull, cloneJson, toArray, toEvent } from "./utils"
+import {
+  ActionTypes,
+  MachineStatus,
+  MachineType,
+  type Dict,
+  type StateMachine as S,
+  type VoidFunction,
+  type Writable,
+} from "./types"
+import { structuredClone, toArray, toEvent } from "./utils"
 
 export class Machine<
   TContext extends Dict,
@@ -28,7 +36,9 @@ export class Machine<
 > {
   public status: MachineStatus = MachineStatus.NotStarted
   public readonly state: S.State<TContext, TState, TEvent>
+
   public initialState: S.StateInfo<TContext, TState, TEvent> | undefined
+  public initialContext: TContext
 
   public id: string
 
@@ -66,8 +76,8 @@ export class Machine<
   // Let's get started!
   constructor(config: S.MachineConfig<TContext, TState, TEvent>, options?: S.MachineOptions<TContext, TState, TEvent>) {
     // clone the config and options
-    this.config = cloneFull(config)
-    this.options = cloneFull(options ?? {})
+    this.config = structuredClone(config)
+    this.options = structuredClone(options ?? {})
 
     this.id = this.config.id ?? `machine-${uuid()}`
 
@@ -80,6 +90,8 @@ export class Machine<
 
     // create mutatable state
     this.state = createProxy(this.config)
+    this.initialContext = snapshot(this.state.context)
+    this.transformContext(this.state.context)
 
     // created actions
     const event = toEvent<TEvent>(ActionTypes.Created)
@@ -92,7 +104,7 @@ export class Machine<
   }
 
   public getState(): S.State<TContext, TState, TEvent> {
-    return cloneJson(this.stateSnapshot)
+    return this.stateSnapshot
   }
 
   // immutable context value
@@ -179,25 +191,16 @@ export class Machine<
 
   private setupContextWatchers = () => {
     for (const [key, fn] of Object.entries(this.config.watch ?? {})) {
-      let cleanup: VoidFunction
-
-      if (key === "*") {
-        cleanup = subscribe(this.state.context, () => {
+      const compareFn = this.options.compareFns?.[key]
+      const cleanup = subscribeKey(
+        this.state.context,
+        key,
+        () => {
           this.executeActions(fn, this.state.event as TEvent)
-        })
-      } else {
-        const compareFn = this.options.compareFns?.[key]
-        cleanup = subscribeKey(
-          this.state.context,
-          key,
-          () => {
-            this.executeActions(fn, this.state.event as TEvent)
-          },
-          this.sync,
-          compareFn,
-        )
-      }
-
+        },
+        this.sync,
+        compareFn,
+      )
       this.contextWatchers.add(cleanup)
     }
   }
@@ -353,16 +356,22 @@ export class Machine<
     }
   }
 
+  private transformContext = (context: Partial<Writable<TContext>> | Partial<TContext>) => {
+    this.options?.transformContext?.(context)
+    return context as TContext
+  }
+
   /**
    * To used within side effects for React or Vue to update context
    */
   public setContext = (context: Partial<Writable<TContext>> | undefined) => {
     if (!context) return
-    deepMerge(this.state.context, context)
+    deepMerge(this.state.context, this.transformContext(context))
   }
 
   public withContext = (context: Partial<Writable<TContext>>) => {
-    const newContext = { ...this.config.context, ...compact(context) } as TContext
+    const transformed = this.transformContext(context)
+    const newContext = { ...this.config.context, ...compact(transformed) } as TContext
     return new Machine({ ...this.config, context: newContext }, this.options)
   }
 
@@ -485,7 +494,7 @@ export class Machine<
    * Useful when spawning child machines and managing the communication between them.
    */
   private get self(): S.Self<TContext, TState, TEvent> {
-    const _self = this
+    const self = this
     return {
       id: this.id,
       send: this.send.bind(this),
@@ -495,7 +504,13 @@ export class Machine<
       stopChild: this.stopChild.bind(this),
       spawn: this.spawn.bind(this) as any,
       get state() {
-        return _self.stateSnapshot
+        return self.stateSnapshot
+      },
+      get initialContext() {
+        return self.initialContext
+      },
+      get initialState() {
+        return self.initialState?.target ?? ""
       },
     }
   }
@@ -506,6 +521,8 @@ export class Machine<
       guards: this.guardMap,
       send: this.send.bind(this),
       self: this.self,
+      initialContext: this.initialContext,
+      initialState: this.initialState?.target ?? "",
       getState: () => this.stateSnapshot,
       getAction: (key) => this.actionMap[key],
       getGuard: (key) => this.guardMap[key],
@@ -523,8 +540,8 @@ export class Machine<
    * (referencing `options.actions`) or actual functions.
    */
   private executeActions = (actions: S.Actions<TContext, TState, TEvent> | undefined, event: TEvent) => {
-    const _actions = determineActionsFn(actions, this.guardMap)(this.contextSnapshot, event, this.guardMeta)
-    for (const action of toArray(_actions)) {
+    const pickedActions = determineActionsFn(actions, this.guardMap)(this.contextSnapshot, event, this.guardMeta)
+    for (const action of toArray(pickedActions)) {
       const fn = isString(action) ? this.actionMap?.[action] : action
       warn(
         isString(action) && !fn,
@@ -673,8 +690,12 @@ export class Machine<
     }
 
     // get all entry actions
-    const _entry = determineActionsFn(stateNode?.entry, this.guardMap)(this.contextSnapshot, event, this.guardMeta)
-    const entryActions = toArray(_entry)
+    const pickedActions = determineActionsFn(stateNode?.entry, this.guardMap)(
+      this.contextSnapshot,
+      event,
+      this.guardMeta,
+    )
+    const entryActions = toArray(pickedActions)
     const afterActions = this.getDelayedEventActions(next)
 
     if (stateNode?.after && afterActions) {

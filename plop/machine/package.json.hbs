@@ -9,15 +9,10 @@
     "main": "src/index.ts",
   "repository": "https://github.com/chakra-ui/zag/tree/main/packages/{{machine}}",
   "sideEffects": false,
-  "files": ["dist/**/*"],
+  "files": ["dist", "src"],
   "scripts": {
-    "build-fast": "tsup src",
-    "start": "pnpm build --watch",
-    "build": "tsup src --dts",
-    "test": "jest --config ../../../jest.config.js --rootDir . --passWithNoTests",
+    "build": "tsup",
     "lint": "eslint src --ext .ts,.tsx",
-    "test-ci": "pnpm test --ci --runInBand",
-    "test-watch": "pnpm test --watch -u",
     "typecheck": "tsc --noEmit",
     "prepack": "clean-package",
     "postpack": "clean-package restore"
@@ -29,12 +24,13 @@
     "url": "https://github.com/chakra-ui/zag/issues"
   },
   "dependencies": {
+    "@zag-js/anatomy": "workspace:*",
     "@zag-js/core": "workspace:*",
+    "@zag-js/dom-query": "workspace:*",
+    "@zag-js/utils": "workspace:*",
     "@zag-js/types": "workspace:*"
   },
   "devDependencies": {
-    "@zag-js/dom-utils": "workspace:*",
-    "@zag-js/utils": "workspace:*",
     "clean-package": "2.2.0"
   },
   "clean-package": "../../../clean-package.config.json"

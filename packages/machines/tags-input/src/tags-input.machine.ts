@@ -1,6 +1,6 @@
 import { autoResizeInput } from "@zag-js/auto-resize"
 import { createMachine, guards } from "@zag-js/core"
-import { contains, raf } from "@zag-js/dom-utils"
+import { contains, raf } from "@zag-js/dom-query"
 import { trackFormControl } from "@zag-js/form-utils"
 import { trackInteractOutside } from "@zag-js/interact-outside"
 import { createLiveRegion } from "@zag-js/live-region"
@@ -85,14 +85,14 @@ export function machine(userContext: UserDefinedContext) {
         SET_VALUE: {
           actions: ["setValue"],
         },
-        DELETE_TAG: {
+        CLEAR_TAG: {
           actions: ["deleteTag"],
         },
         SET_VALUE_AT_INDEX: {
           actions: ["setValueAtIndex"],
         },
-        CLEAR_ALL: {
-          actions: ["clearTags", "focusInput"],
+        CLEAR_VALUE: {
+          actions: ["clearTags", "clearInputValue", "focusInput"],
         },
         ADD_TAG: {
           // (!isAtMax || allowOverflow) && !inputValueIsEmpty
@@ -272,7 +272,11 @@ export function machine(userContext: UserDefinedContext) {
               const combobox = document.getElementById(`${ctx.id}:combobox:listbox`)
               return contains(dom.getRootEl(ctx), target) || contains(combobox, target)
             },
-            onInteractOutside() {
+            onFocusOutside: ctx.onFocusOutside,
+            onPointerDownOutside: ctx.onPointerDownOutside,
+            onInteractOutside(event) {
+              ctx.onInteractOutside?.(event)
+              if (event.defaultPrevented) return
               send({ type: "BLUR", src: "interact-outside" })
             },
           })

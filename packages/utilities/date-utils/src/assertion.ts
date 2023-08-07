@@ -1,11 +1,11 @@
-import { CalendarDate, DateValue, isSameDay, isToday } from "@internationalized/date"
-import { DateAvailableFn } from "./types"
+import { type DateValue, isSameDay, isToday } from "@internationalized/date"
+import type { DateAvailableFn } from "./types"
 
-export function isTodayDate(date: CalendarDate, timeZone: string) {
+export function isTodayDate(date: DateValue, timeZone: string) {
   return isToday(date, timeZone)
 }
 
-export function isDateEqual(dateA: CalendarDate, dateB?: CalendarDate | null) {
+export function isDateEqual(dateA: DateValue, dateB?: DateValue | null) {
   return dateB != null && isSameDay(dateA, dateB)
 }
 
@@ -26,24 +26,25 @@ export function isDateDisabled(
 export function isDateUnavailable(
   date: DateValue | null,
   isUnavailable: DateAvailableFn | undefined,
+  locale: string,
   minValue?: DateValue | null,
   maxValue?: DateValue | null,
 ) {
   if (!date) {
     return false
   }
-  if (isUnavailable?.(date)) {
+  if (isUnavailable?.(date, locale)) {
     return true
   }
   return isDateInvalid(date, minValue, maxValue)
 }
 
-export function isDateOutsideVisibleRange(date: CalendarDate, startDate: CalendarDate, endDate: CalendarDate) {
+export function isDateOutsideVisibleRange(date: DateValue, startDate: DateValue, endDate: DateValue) {
   return date.compare(startDate) < 0 || date.compare(endDate) > 0
 }
 
 export function isPreviousVisibleRangeInvalid(
-  startDate: CalendarDate,
+  startDate: DateValue,
   minValue?: DateValue | null,
   maxValue?: DateValue | null,
 ) {
@@ -52,7 +53,7 @@ export function isPreviousVisibleRangeInvalid(
 }
 
 export function isNextVisibleRangeInvalid(
-  endDate: CalendarDate,
+  endDate: DateValue,
   minValue?: DateValue | null,
   maxValue?: DateValue | null,
 ) {

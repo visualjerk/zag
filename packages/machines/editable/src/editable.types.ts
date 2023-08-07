@@ -1,5 +1,6 @@
 import type { StateMachine as S } from "@zag-js/core"
-import type { CommonProperties, Context, DirectionProperty, RequiredBy } from "@zag-js/types"
+import type { InteractOutsideEvent, InteractOutsideHandlers } from "@zag-js/interact-outside"
+import type { CommonProperties, Context, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
 
 export type ActivationMode = "focus" | "dblclick" | "none"
 
@@ -25,7 +26,8 @@ type ElementIds = Partial<{
 }>
 
 type PublicContext = DirectionProperty &
-  CommonProperties & {
+  CommonProperties &
+  InteractOutsideHandlers & {
     /**
      * The ids of the elements in the editable. Useful for composition.
      */
@@ -115,7 +117,56 @@ type PublicContext = DirectionProperty &
      * Specifies the localized strings that identifies the accessibility elements and their states
      */
     translations: IntlTranslations
+    /**
+     * The element that should receive focus when the editable is closed.
+     * By default, it will focus on the trigger element.
+     */
+    finalFocusEl?: () => HTMLElement | null
   }
+
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * Whether the editable is in edit mode
+   */
+  isEditing: boolean
+  /**
+   * Whether the editable value is empty
+   */
+  isValueEmpty: boolean
+  /**
+   * The current value of the editable
+   */
+  value: string
+  /**
+   * Function to set the value of the editable
+   */
+  setValue(value: string): void
+  /**
+   * Function to clear the value of the editable
+   */
+  clearValue(): void
+  /**
+   * Function to enter edit mode
+   */
+  edit(): void
+  /**
+   * Function to exit edit mode, and discard any changes
+   */
+  cancel(): void
+  /**
+   * Function to exit edit mode, and submit any changes
+   */
+  submit(): void
+  rootProps: T["element"]
+  areaProps: T["element"]
+  labelProps: T["label"]
+  inputProps: T["input"]
+  previewProps: T["element"]
+  editTriggerProps: T["button"]
+  controlProps: T["element"]
+  submitTriggerProps: T["button"]
+  cancelTriggerProps: T["button"]
+}
 
 export type UserDefinedContext = RequiredBy<PublicContext, "id">
 
@@ -164,3 +215,5 @@ export type MachineState = {
 export type State = S.State<MachineContext, MachineState>
 
 export type Send = S.Send<S.AnyEventObject>
+
+export type { InteractOutsideEvent }

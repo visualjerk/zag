@@ -1,5 +1,5 @@
 import { createMachine } from "@zag-js/core"
-import { raf } from "@zag-js/dom-utils"
+import { raf } from "@zag-js/dom-query"
 import { trackFormControl } from "@zag-js/form-utils"
 import { compact } from "@zag-js/utils"
 import { dom } from "./rating-group.dom"
@@ -16,7 +16,6 @@ export function machine(userContext: UserDefinedContext) {
         max: 5,
         dir: "ltr",
         value: -1,
-        initialValue: -1,
         hoveredValue: -1,
         disabled: false,
         readOnly: false,
@@ -40,7 +39,15 @@ export function machine(userContext: UserDefinedContext) {
       },
 
       activities: ["trackFormControlState"],
-      entry: ["checkValue"],
+
+      on: {
+        SET_VALUE: {
+          actions: ["setValue"],
+        },
+        CLEAR_VALUE: {
+          actions: ["clearValue"],
+        },
+      },
 
       states: {
         idle: {
@@ -116,22 +123,18 @@ export function machine(userContext: UserDefinedContext) {
         isRadioFocused: (ctx) => !!dom.getControlEl(ctx)?.contains(dom.getActiveEl(ctx)),
       },
       activities: {
-        trackFormControlState(ctx) {
+        trackFormControlState(ctx, _evt, { initialContext }) {
           return trackFormControl(dom.getHiddenInputEl(ctx), {
             onFieldsetDisabled() {
               ctx.disabled = true
             },
             onFormReset() {
-              ctx.value = ctx.initialValue
+              ctx.value = initialContext.value
             },
           })
         },
       },
       actions: {
-        checkValue(ctx) {
-          ctx.initialValue = ctx.value
-        },
-
         clearHoveredValue(ctx) {
           ctx.hoveredValue = -1
         },
@@ -156,24 +159,20 @@ export function machine(userContext: UserDefinedContext) {
         setValue(ctx, evt) {
           ctx.value = ctx.hoveredValue === -1 ? evt.value : ctx.hoveredValue
         },
+        clearValue(ctx) {
+          ctx.value = -1
+        },
         setHoveredValue(ctx, evt) {
           const half = ctx.allowHalf && evt.isMidway
-          let factor = half ? 0.5 : 0
-          if (ctx.dir === "rtl") {
-            factor = half ? 0 : 0.5
-          }
+          const factor = half ? 0.5 : 0
           let value = evt.index - factor
           ctx.hoveredValue = value
         },
-        dispatchChangeEvent(ctx, evt) {
-          if (evt.type !== "SETUP") {
-            dom.dispatchChangeEvent(ctx)
-          }
+        dispatchChangeEvent(ctx) {
+          dom.dispatchChangeEvent(ctx)
         },
-        invokeOnChange(ctx, evt) {
-          if (evt.type !== "SETUP") {
-            ctx.onChange?.({ value: ctx.value })
-          }
+        invokeOnChange(ctx) {
+          ctx.onChange?.({ value: ctx.value })
         },
         invokeOnHover(ctx) {
           ctx.onHover?.({ value: ctx.hoveredValue })

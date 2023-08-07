@@ -1,44 +1,52 @@
 import {
-  ariaAttr,
-  dataAttr,
-  EventKeyMap,
   getEventKey,
   getEventPoint,
   getNativeEvent,
-  getPointRelativeToNode,
+  getRelativePoint,
   isLeftClick,
-} from "@zag-js/dom-utils"
+  type EventKeyMap,
+} from "@zag-js/dom-event"
+import { ariaAttr, dataAttr } from "@zag-js/dom-query"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
-import { cast } from "@zag-js/utils"
 import { parts } from "./rating-group.anatomy"
 import { dom } from "./rating-group.dom"
-import type { Send, State } from "./rating-group.types"
+import type { ItemProps, ItemState, PublicApi, Send, State } from "./rating-group.types"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const isInteractive = state.context.isInteractive
   const value = state.context.value
+  const hoveredValue = state.context.hoveredValue
   const isDisabled = state.context.disabled
   const translations = state.context.translations
 
   const api = {
+    setValue(value: number) {
+      send({ type: "SET_VALUE", value })
+    },
+
+    clearValue() {
+      send("CLEAR_VALUE")
+    },
+
     isHovering: state.context.isHovering,
     value,
-    hoveredValue: state.context.hoveredValue,
+    hoveredValue,
     size: state.context.max,
     sizeArray: Array.from({ length: state.context.max }).map((_, index) => index + 1),
-    getRatingState(index: number) {
-      const value = state.context.isHovering ? state.context.hoveredValue : state.context.value
-      const isEqual = Math.ceil(value) === index
 
-      const isHighlighted = index <= value || isEqual
-      const isHalf = isEqual && Math.abs(value - index) === 0.5
+    getRatingState(props: ItemProps): ItemState {
+      const value = state.context.isHovering ? state.context.hoveredValue : state.context.value
+      const isEqual = Math.ceil(value) === props.index
+
+      const isHighlighted = props.index <= value || isEqual
+      const isHalf = isEqual && Math.abs(value - props.index) === 0.5
 
       return {
         isEqual,
         isValueEmpty: state.context.value === -1,
         isHighlighted,
         isHalf,
-        isChecked: isEqual || (state.context.value === -1 && index === 1),
+        isChecked: isEqual || (state.context.value === -1 && props.index === 1),
       }
     },
 
@@ -82,8 +90,9 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
       },
     }),
 
-    getRatingProps({ index }: { index: number }) {
-      const { isHalf, isHighlighted, isChecked } = api.getRatingState(index)
+    getRatingProps(props: ItemProps) {
+      const { index } = props
+      const { isHalf, isHighlighted, isChecked } = api.getRatingState(props)
       const valueText = translations.ratingValueText(index)
 
       return normalize.element({
@@ -112,10 +121,12 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         },
         onPointerMove(event) {
           if (!isInteractive) return
-          const point = getEventPoint(cast(event))
-          const el = event.currentTarget
-          const relativePoint = getPointRelativeToNode(point, el)
-          const percentX = relativePoint.x / el.offsetWidth
+          const point = getEventPoint(getNativeEvent(event))
+          const relativePoint = getRelativePoint(point, event.currentTarget)
+          const percentX = relativePoint.getPercentValue({
+            orientation: "horizontal",
+            dir: state.context.dir,
+          })
           const isMidway = percentX < 0.5
           send({ type: "POINTER_OVER", index, isMidway })
         },
@@ -132,7 +143,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
               send("ARROW_LEFT")
             },
             ArrowDown() {
-              send("ARROW_LEFT")
+              send("ARROW_RIGHT")
             },
             Space() {
               send({ type: "SPACE", value: index })

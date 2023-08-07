@@ -1,5 +1,5 @@
 import type { StateMachine as S } from "@zag-js/core"
-import type { CommonProperties, Context, DirectionProperty, RequiredBy } from "@zag-js/types"
+import type { CommonProperties, Context, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
 
 export type PointerType = "mouse" | "pen" | "touch" | "keyboard" | "virtual"
 
@@ -32,10 +32,6 @@ export interface PressEvent {
    * The target element of the press event.
    */
   target: HTMLElement
-  /**
-   * The original fired event
-   */
-  originalEvent?: PointerEvent
 }
 
 export type PressHandlers = {
@@ -88,15 +84,26 @@ type PublicContext = DirectionProperty &
      * Whether text selection should be enabled on the pressable element.
      */
     allowTextSelectionOnPress?: boolean
+    /**
+     * The amount of time (in milliseconds) to wait before firing the `onLongPress` event.
+     */
+    longPressDelay: number
   }
+
+export type PublicApi<T extends PropTypes = PropTypes> = {
+  /**
+   * Whether the element is pressed.
+   */
+  isPressed: boolean
+  pressableProps: T["element"]
+}
 
 interface FocusableElement extends HTMLElement, HTMLOrSVGElement {}
 
 type PrivateContext = Context<{
   ignoreClickAfterPress: boolean
-  activePointerId: number | null
   target: FocusableElement | null
-  pointerdownEvent: PointerEvent | null
+  pointerId: number | null
   pointerType: PointerType | null
   cleanups: VoidFunction[]
   wasPressedDown: boolean

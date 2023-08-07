@@ -1,21 +1,21 @@
 import {
-  dataAttr,
-  EventKeyMap,
   getEventKey,
   getEventPoint,
   getEventStep,
   getNativeEvent,
   isLeftClick,
   isModifiedEvent,
-} from "@zag-js/dom-utils"
+  type EventKeyMap,
+} from "@zag-js/dom-event"
+import { ariaAttr, dataAttr } from "@zag-js/dom-query"
 import { getPercentValue, getValuePercent } from "@zag-js/numeric-range"
 import type { NormalizeProps, PropTypes } from "@zag-js/types"
 import { parts } from "./range-slider.anatomy"
 import { dom } from "./range-slider.dom"
-import type { Send, State } from "./range-slider.types"
+import type { PublicApi, Send, State } from "./range-slider.types"
 import { getRangeAtIndex } from "./range-slider.utils"
 
-export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>) {
+export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): PublicApi<T> {
   const ariaLabel = state.context["aria-label"]
   const ariaLabelledBy = state.context["aria-labelledby"]
   const sliderValue = state.context.value
@@ -35,43 +35,57 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
     return getPercentValue(percent, state.context.min, state.context.max, state.context.step)
   }
 
+  // TODO - getThumbState
+
   return {
     value: state.context.value,
     isDragging,
     isFocused,
+
     setValue(value: number[]) {
       send({ type: "SET_VALUE", value: value })
     },
+
     getThumbValue(index: number) {
       return sliderValue[index]
     },
+
     setThumbValue(index: number, value: number) {
       send({ type: "SET_VALUE", index, value })
     },
+
     getValuePercent: getValuePercentFn,
+
     getPercentValue: getPercentValueFn,
+
     getThumbPercent(index: number) {
       return getValuePercentFn(sliderValue[index])
     },
+
     setThumbPercent(index: number, percent: number) {
       const value = getPercentValueFn(percent)
       send({ type: "SET_VALUE", index, value })
     },
+
     getThumbMin(index: number) {
       return getRangeAtIndex(state.context, index).min
     },
+
     getThumbMax(index: number) {
       return getRangeAtIndex(state.context, index).max
     },
+
     increment(index: number) {
       send({ type: "INCREMENT", index })
     },
+
     decrement(index: number) {
       send({ type: "DECREMENT", index })
     },
-    focus(index = 0) {
+
+    focus() {
       if (!isInteractive) return
-      send({ type: "FOCUS", index })
+      send({ type: "FOCUS", index: 0 })
     },
 
     labelProps: normalize.label({
@@ -135,7 +149,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         "data-orientation": state.context.orientation,
         "data-focus": dataAttr(isFocused && state.context.activeIndex === index),
         draggable: false,
-        "aria-disabled": isDisabled || undefined,
+        "aria-disabled": ariaAttr(isDisabled),
         "aria-label": _ariaLabel,
         "aria-labelledby": _ariaLabelledBy ?? dom.getLabelId(state.context),
         "aria-orientation": state.context.orientation,
@@ -239,7 +253,8 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         const evt = getNativeEvent(event)
         if (!isLeftClick(evt) || isModifiedEvent(evt)) return
 
-        send({ type: "POINTER_DOWN", point: getEventPoint(evt) })
+        const point = getEventPoint(evt)
+        send({ type: "POINTER_DOWN", point })
 
         event.preventDefault()
         event.stopPropagation()
@@ -271,8 +286,8 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
         ...parts.marker.attrs,
         id: dom.getMarkerId(state.context, value),
         role: "presentation",
+        "data-orientation": state.context.orientation,
         "data-value": value,
-        "aria-hidden": true,
         "data-disabled": dataAttr(isDisabled),
         "data-state": markerState,
         style,

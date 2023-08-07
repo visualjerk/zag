@@ -1,5 +1,216 @@
 # @zag-js/dismissable
 
+## 0.13.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.13.0
+  - @zag-js/dom-event@0.13.0
+  - @zag-js/dom-query@0.13.0
+  - @zag-js/interact-outside@0.13.0
+
+## 0.12.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.12.0
+  - @zag-js/dom-event@0.12.0
+  - @zag-js/dom-query@0.12.0
+  - @zag-js/interact-outside@0.12.0
+
+## 0.11.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.11.2
+  - @zag-js/dom-event@0.11.2
+  - @zag-js/dom-query@0.11.2
+  - @zag-js/interact-outside@0.11.2
+
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.11.1
+  - @zag-js/dom-event@0.11.1
+  - @zag-js/dom-query@0.11.1
+  - @zag-js/interact-outside@0.11.1
+
+## 0.11.0
+
+### Patch Changes
+
+- [`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Rebuild all packages using tsup
+
+- Updated dependencies [[`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce)]:
+  - @zag-js/interact-outside@0.11.0
+  - @zag-js/dom-event@0.11.0
+  - @zag-js/dom-query@0.11.0
+  - @zag-js/utils@0.11.0
+
+## 0.10.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.10.5
+  - @zag-js/dom-event@0.10.5
+  - @zag-js/dom-query@0.10.5
+  - @zag-js/interact-outside@0.10.5
+
+## 0.10.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.10.4
+  - @zag-js/dom-event@0.10.4
+  - @zag-js/dom-query@0.10.4
+  - @zag-js/interact-outside@0.10.4
+
+## 0.10.3
+
+### Patch Changes
+
+- [`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Use vite to build packages
+
+- Updated dependencies [[`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7),
+  [`775f11c9`](https://github.com/chakra-ui/zag/commit/775f11c96759197fcbad14b5b8a0fbde095efc55)]:
+  - @zag-js/utils@0.10.3
+  - @zag-js/dom-event@0.10.3
+  - @zag-js/dom-query@0.10.3
+  - @zag-js/interact-outside@0.10.3
+
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.10.2
+  - @zag-js/dom-event@0.10.2
+  - @zag-js/dom-query@0.10.2
+  - @zag-js/interact-outside@0.10.2
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/utils@0.10.1
+  - @zag-js/dom-event@0.10.1
+  - @zag-js/dom-query@0.10.1
+  - @zag-js/interact-outside@0.10.1
+
+## 0.10.0
+
+### Patch Changes
+
+- Updated dependencies [[`dbc13547`](https://github.com/chakra-ui/zag/commit/dbc13547deeef869640f637f3c0affab8fb82c17),
+  [`e8ac03ef`](https://github.com/chakra-ui/zag/commit/e8ac03ef4b820773a5875db861735e2aac8f29da)]:
+  - @zag-js/dom-event@0.10.0
+  - @zag-js/dom-query@0.10.0
+  - @zag-js/interact-outside@0.10.0
+  - @zag-js/utils@0.10.0
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`280015e3`](https://github.com/chakra-ui/zag/commit/280015e36539f23731cba09a28e1371d5760b8b4)]:
+  - @zag-js/dom-event@0.9.2
+  - @zag-js/interact-outside@0.9.2
+  - @zag-js/utils@0.9.2
+  - @zag-js/dom-query@0.9.2
+
+## 0.9.1
+
+### Patch Changes
+
+- [`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Force release every package to fix regression
+
+- Updated dependencies [[`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f)]:
+  - @zag-js/utils@0.9.1
+  - @zag-js/dom-event@0.9.1
+  - @zag-js/dom-query@0.9.1
+  - @zag-js/interact-outside@0.9.1
+
+## 0.8.0
+
+### Patch Changes
+
+- [`fb4fb42d`](https://github.com/chakra-ui/zag/commit/fb4fb42d8aacc5844945dd7b1bd27b94c978ca4e) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add support for `defer` option to allow defering the execution of
+  a function to the next tick
+
+- Updated dependencies [[`fb4fb42d`](https://github.com/chakra-ui/zag/commit/fb4fb42d8aacc5844945dd7b1bd27b94c978ca4e)]:
+  - @zag-js/interact-outside@0.8.0
+  - @zag-js/dom-event@0.8.0
+
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [[`657df96e`](https://github.com/chakra-ui/zag/commit/657df96e0fbc59dcab8d06eb90105519d32b527f)]:
+  - @zag-js/dom-event@0.6.0
+  - @zag-js/interact-outside@0.6.0
+
+## 0.5.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @zag-js/dom-event@0.5.0
+  - @zag-js/interact-outside@0.5.0
+
+## 0.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`30dbeb28`](https://github.com/chakra-ui/zag/commit/30dbeb282f7901c33518097a0e1dd9a857f7efb0)]:
+  - @zag-js/utils@0.3.4
+  - @zag-js/interact-outside@0.2.6
+
+## 0.2.5
+
+### Patch Changes
+
+- [`9d4db09e`](https://github.com/chakra-ui/zag/commit/9d4db09e1b31b4f5bd85a04622359b3312171741) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Re-export types from `@zag-js/interact-outside` package.
+
+- Updated dependencies [[`1dcbc349`](https://github.com/chakra-ui/zag/commit/1dcbc349a2e8b27cda21e136de2d4feb5dd797bb)]:
+  - @zag-js/interact-outside@0.2.5
+
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`1446d88b`](https://github.com/chakra-ui/zag/commit/1446d88bff3848f2a2ec0a793ee83281cda966e8),
+  [`f55fc3a0`](https://github.com/chakra-ui/zag/commit/f55fc3a01ab7b95ac29caf41eaeac4033b00e1be)]:
+  - @zag-js/dom-query@0.1.4
+  - @zag-js/interact-outside@0.2.4
+
+## 0.2.3
+
+### Patch Changes
+
+- [#536](https://github.com/chakra-ui/zag/pull/536)
+  [`aabc9aed`](https://github.com/chakra-ui/zag/commit/aabc9aed93ae3f49e2cec8d8b28edd23a337ce99) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Refactor all packages to have proper dependency structure and
+  bundle size.
+
+- Updated dependencies [[`58078617`](https://github.com/chakra-ui/zag/commit/58078617637c22756497cb6e1d90618586e55687),
+  [`aabc9aed`](https://github.com/chakra-ui/zag/commit/aabc9aed93ae3f49e2cec8d8b28edd23a337ce99)]:
+  - @zag-js/interact-outside@0.2.3
+  - @zag-js/dom-event@0.0.1
+  - @zag-js/dom-query@0.1.3
+
 ## 0.2.2
 
 ### Patch Changes

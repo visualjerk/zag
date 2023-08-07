@@ -1,43 +1,56 @@
-type Fn = (rect: DOMRect) => void
+type Fn = (rect: Rect) => void
+
+type Rect = {
+  top: number
+  left: number
+  width: number
+  height: number
+}
 
 type ObservedData = {
-  rect: DOMRect
+  rect: Rect
   callbacks: Fn[]
 }
 
-export type Measurable = {
-  getBoundingClientRect(): DOMRect
+let rafId: number
+
+const observedElements = new Map<HTMLElement, ObservedData>()
+
+type TrackScope = "size" | "position" | "rect"
+
+export type ElementRectOptions = {
+  onChange: (rect: Rect) => void
+  scope?: TrackScope
+  getRect?: (el: HTMLElement) => Rect
 }
 
-function getObservedElements(): Map<Measurable, ObservedData> {
-  ;(globalThis as any).__rectObserverMap__ = (globalThis as any).__rectObserverMap__ || new Map()
-  return (globalThis as any).__rectObserverMap__
-}
+const getRectFn = (el: HTMLElement) => el.getBoundingClientRect()
 
-export function trackElementRect(el: Measurable, fn: Fn) {
-  const observedElements = getObservedElements()
+export function trackElementRect(el: HTMLElement, options: ElementRectOptions) {
+  const { scope = "rect", getRect = getRectFn, onChange } = options
+  const loop = getLoopFn({ scope, getRect })
 
   const data = observedElements.get(el)
 
   if (!data) {
     observedElements.set(el, {
-      rect: {} as DOMRect,
-      callbacks: [fn],
+      rect: {} as Rect,
+      callbacks: [onChange],
     })
 
     if (observedElements.size === 1) {
       rafId = requestAnimationFrame(loop)
     }
   } else {
-    data.callbacks.push(fn)
-    fn(el.getBoundingClientRect())
+    data.callbacks.push(onChange)
+    onChange(getRect(el))
   }
 
   return function unobserve() {
     const data = observedElements.get(el)
     if (!data) return
 
-    const index = data.callbacks.indexOf(fn)
+    const index = data.callbacks.indexOf(onChange)
     if (index > -1) {
       data.callbacks.splice(index, 1)
     }
@@ -52,36 +65,37 @@ export function trackElementRect(el: Measurable, fn: Fn) {
   }
 }
 
-let rafId: number
+function getLoopFn(options: Required<Omit<ElementRectOptions, "onChange">>) {
+  const { scope, getRect } = options
+  const isEqual = getEqualityFn(scope)
+  return function loop() {
+    const changedRectsData: Array<ObservedData> = []
 
-function loop() {
-  const observedElements = getObservedElements()
+    observedElements.forEach((data, element) => {
+      const newRect = getRect(element)
 
-  const changedRectsData: Array<ObservedData> = []
+      if (!isEqual(data.rect, newRect)) {
+        data.rect = newRect
+        changedRectsData.push(data)
+      }
+    })
 
-  observedElements.forEach((data, element) => {
-    const newRect = element.getBoundingClientRect()
+    changedRectsData.forEach((data) => {
+      data.callbacks.forEach((callback) => callback(data.rect))
+    })
 
-    if (!isEqual(data.rect, newRect)) {
-      data.rect = newRect
-      changedRectsData.push(data)
-    }
-  })
-
-  changedRectsData.forEach((data) => {
-    data.callbacks.forEach((callback) => callback(data.rect))
-  })
-
-  rafId = requestAnimationFrame(loop)
+    rafId = requestAnimationFrame(loop)
+  }
 }
 
-function isEqual(rect1: DOMRect, rect2: DOMRect) {
-  return (
-    rect1.width === rect2.width &&
-    rect1.height === rect2.height &&
-    rect1.top === rect2.top &&
-    rect1.right === rect2.right &&
-    rect1.bottom === rect2.bottom &&
-    rect1.left === rect2.left
-  )
+const isEqualSize = (a: Rect, b: Rect) => a.width === b.width && a.height === b.height
+
+const isEqualPosition = (a: Rect, b: Rect) => a.top === b.top && a.left === b.left
+
+const isEqualRect = (a: Rect, b: Rect) => isEqualSize(a, b) && isEqualPosition(a, b)
+
+function getEqualityFn(scope: TrackScope) {
+  if (scope === "size") return isEqualSize
+  if (scope === "position") return isEqualPosition
+  return isEqualRect
 }

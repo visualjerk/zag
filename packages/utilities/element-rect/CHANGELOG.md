@@ -1,5 +1,69 @@
 # @zag-js/element-rect
 
+## 0.13.0
+
+## 0.12.0
+
+## 0.11.2
+
+## 0.11.1
+
+## 0.11.0
+
+### Patch Changes
+
+- [`4f371874`](https://github.com/chakra-ui/zag/commit/4f3718742dc88a2cd8726bdd889c9bbde94f5bce) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Rebuild all packages using tsup
+
+## 0.10.5
+
+## 0.10.4
+
+## 0.10.3
+
+### Patch Changes
+
+- [`c59a8dec`](https://github.com/chakra-ui/zag/commit/c59a8dec15ab57d218823bfe7af6d723972be6c7) Thanks
+  [@cschroeter](https://github.com/cschroeter)! - Use vite to build packages
+
+## 0.10.2
+
+## 0.10.1
+
+## 0.10.0
+
+## 0.9.2
+
+## 0.9.1
+
+### Patch Changes
+
+- [`8469daa1`](https://github.com/chakra-ui/zag/commit/8469daa15fd7f2c0a80869a8715b0342bd3c355f) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Force release every package to fix regression
+
+## 0.8.0
+
+### Minor Changes
+
+- [`bf136f6e`](https://github.com/chakra-ui/zag/commit/bf136f6ef8c9499bd0fbc4be057d02697e97a010) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add support customizing the element rect calculation function
+
+## 0.3.0
+
+### Minor Changes
+
+- [`fa2ecc8e`](https://github.com/chakra-ui/zag/commit/fa2ecc8ea235b824f45deda10070c321f896886c) Thanks
+  [@segunadebayo](https://github.com/segunadebayo)! - Add support for scoping the element rect tracking to size,
+  position or rect.
+
+  ```js
+  import { trackElementRect } from "@zag-js/element-rect"
+
+  trackElementRect(element, update, { scope: "size" }) // only track size
+  trackElementRect(element, update, { scope: "position" }) // only track position
+  trackElementRect(element, update, { scope: "rect" }) // track size and position (default)
+  ```
+
 ## 0.2.2
 
 ### Patch Changes

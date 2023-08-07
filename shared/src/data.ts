@@ -1,4 +1,6 @@
-import { getData } from "country-list"
+import countryList from "country-list"
+
+const { getData } = countryList
 
 export { paginationData } from "./pagination-data"
 
@@ -12,6 +14,17 @@ export const accordionData = [
   { id: "about", label: "About" },
   { id: "contact", label: "Contact" },
 ]
+
+export const avatarData = {
+  full: [
+    "https://static.wikia.nocookie.net/naruto/images/d/d6/Naruto_Part_I.png/revision/latest/top-crop/width/200/height/150?cb=20210223094656",
+    "https://static.wikia.nocookie.net/naruto/images/2/27/Kakashi_Hatake.png/revision/latest/top-crop/width/200/height/150?cb=20170628120149",
+    "https://static.wikia.nocookie.net/naruto/images/4/4a/Obito_Uchiha.png/revision/latest/top-crop/width/200/height/150?cb=20220223045744",
+    "https://static.wikia.nocookie.net/naruto/images/e/e9/Itachi_Child_OL.png/revision/latest/top-crop/width/200/height/150?cb=20210415223303",
+  ],
+  broken:
+    "https://broken.wikia.nocookie.net/naruto/images/e/e9/Itachi_ld_OL.png/revision/latest/top-crop/width/200/height/150?cb=20223303",
+}
 
 export const comboboxData = [
   { label: "Zambia", code: "ZA" },
@@ -116,4 +129,18 @@ export const radioData = [
   { id: "orange", label: "Oranges" },
   { id: "mango", label: "Mangoes" },
   { id: "grape", label: "Grapes" },
+]
+
+export const carouselData = [
+  "https://tinyurl.com/5b6ka8jd",
+  "https://tinyurl.com/7rmccdn5",
+  "https://tinyurl.com/59jxz9uu",
+  "https://tinyurl.com/6jurv23t",
+  "https://tinyurl.com/yp4rfum7",
+]
+
+export const toggleGroupData = [
+  { value: "bold", label: "B" },
+  { value: "italic", label: "I" },
+  { value: "underline", label: "U" },
 ]
