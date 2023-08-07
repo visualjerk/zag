@@ -268,9 +268,7 @@ export function machine(userContext: UserDefinedContext) {
         trackInteractOutside(ctx, _evt, { send }) {
           return trackInteractOutside(dom.getInputEl(ctx), {
             exclude(target) {
-              // handle composition when used as combobox
-              const combobox = document.getElementById(`${ctx.id}:combobox:listbox`)
-              return contains(dom.getRootEl(ctx), target) || contains(combobox, target)
+              return contains(dom.getRootEl(ctx), target)
             },
             onFocusOutside: ctx.onFocusOutside,
             onPointerDownOutside: ctx.onPointerDownOutside,
